@@ -1,22 +1,30 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+
     <title>Mata Mosquito</title>
+
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
     <div id="custom-cursor"></div>
 
     <div class="container">
+
         <header>
+
             <div id="logo">
                 Mata Mosquito
+
                 <figure>
-                    <img class="img-logo" src="../img/Mosquito.png" alt="logo">
+                    <img class="img-logo" src="img/Mosquito.png" alt="logo">
                 </figure>
             </div>
 
@@ -27,34 +35,89 @@
                     </li>
                 </ul>
             </nav>
+
         </header>
-        
-        <main id="lobby-screen">       
+
+
+        <!-- LOBBY -->
+
+        <main id="lobby-screen">
+
             <div class="logo-spacer"></div>
 
-            <a class="bounce2" id="btn-jogar" onclick="jogar()">JOGAR AGORA</a>
+            <a class="bounce2" id="btn-jogar" onclick="jogar()">
+                JOGAR AGORA
+            </a>
+
         </main>
 
+
+        <!-- JOGO -->
+
         <div id="game-screen" class="hidden">
+
             <div id="hud">
-                <div class="hud-item">VIDA: <span id="lives-display">❤️</span></div>
-                <div class="hud-item">PONTOS: <span id="score-display">0</span></div>
-                <div class="hud-item">RECORDE: <span id="highscore-display">0</span></div>
+
+                <div class="hud-item">
+                    VIDA:
+                    <span id="lives-display">❤️❤️❤️</span>
+                </div>
+
+                <div class="hud-item">
+                    PONTOS:
+                    <span id="score-display">0</span>
+                </div>
+
+                <div class="hud-item">
+                    RECORDE:
+                    <span id="highscore-display">0</span>
+                </div>
+
+                <div class="hud-item">
+                    NÍVEL:
+                    <span id="level-display">1</span>
+                </div>
+
+                <div class="hud-item">
+                    TEMPO:
+                    <span id="time-display">60</span>
+                </div>
+
             </div>
-            
+
+
             <canvas id="gameCanvas" width="800" height="500"></canvas>
 
-            <div id="game-overlay" class="overlay hidden">
-                <h2 id="overlay-title">GAME OVER</h2>
-                <p id="overlay-msg">Sua bola caiu!</p>
-                <button id="btn-restart" onclick="reiniciarJogo()">TENTAR NOVAMENTE</button>
-            </div>
-        </div>
-        
-        <footer></footer>
-    </div> 
 
-    <script src="js/index.js"></script>
+            <div id="game-overlay" class="overlay hidden">
+
+                <h2 id="overlay-title">GAME OVER</h2>
+
+                <p id="overlay-msg">
+                    Sua bola caiu!
+                </p>
+
+                <button id="btn-restart" onclick="reiniciarJogo()">
+                    TENTAR NOVAMENTE
+                </button>
+
+                <button id="btn-menu" onclick="voltarAoMenu()">
+                    VOLTAR AO MENU
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <footer></footer>
+
+    </div>
+
+
+    <script src="js/script.js"></script>
     <script src="js/game.js"></script>
+
 </body>
+
 </html>

@@ -13,10 +13,15 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+
     font-family: 'Orbitron', sans-serif;
+
     height: 100vh;
     overflow: hidden;
+
     color: white;
+
+    transition: background-image 0.8s ease;
 }
 
 .container {
@@ -29,17 +34,22 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     padding: 10px 20px;
+
     z-index: 10;
 }
 
 #logo {
     color: #2cff25;
+
     font-size: 28px;
     font-weight: bold;
+
     display: flex;
     gap: 8px;
     align-items: center;
+
     text-shadow: 0 0 10px #25D9FF;
 }
 
@@ -55,6 +65,7 @@ header {
 
 ul {
     list-style: none;
+
     display: flex;
     gap: 10px;
 }
@@ -64,45 +75,77 @@ li {
     padding: 10px;
 }
 
-.active {   
+.active {
     background-color: #d47e1c;
+
     border-radius: 5px;
+
     box-shadow: 0 0 10px #2cff25;
 }
 
-/* Área principal do Lobby */
+
+/* =============================== */
+/* LOBBY */
+/* =============================== */
+
 #lobby-screen {
     flex-grow: 1;
+
     display: flex;
     flex-direction: column;
+
     justify-content: flex-end;
     align-items: center;
-    padding-bottom: 110px; /* Aumentado para subir o botão na tela */
+
+    padding-bottom: 110px;
+
     gap: 15px;
+
     position: relative;
 }
 
-/* Espaçador transparente */
 .logo-spacer {
-    flex-grow: 1; 
+    flex-grow: 1;
 }
 
 
-/* Botão maior e mais destacado */
+/* BOTÃO JOGAR */
+
 #btn-jogar {
-    background: linear-gradient(110deg, #d47e1c 0%, #2cff25 50%, #2cff25 50%, #d47e1c 100%);
+    background: linear-gradient(
+        110deg,
+        #d47e1c 0%,
+        #2cff25 50%,
+        #2cff25 50%,
+        #d47e1c 100%
+    );
+
     text-decoration: none;
+
     color: white;
-    padding: 18px 40px;   /* Aumentado o espaçamento interno */
+
+    padding: 18px 40px;
+
     border-radius: 35px;
-    box-shadow: -4px 0px 20px #25D9FF, 4px 0px 20px #FF3DDE;
+
+    box-shadow:
+        -4px 0px 20px #25D9FF,
+        4px 0px 20px #FF3DDE;
+
     display: flex;
+
     text-align: center;
-    width: 480px;          /* Aumentada a largura de 320px para 480px */
+
+    width: 480px;
+
     justify-content: center;
-    font-size: 28px;       /* Aumentado o tamanho do texto de 20px para 28px */
+
+    font-size: 28px;
+
     font-weight: 900;
+
     cursor: pointer;
+
     z-index: 2;
 }
 
@@ -111,11 +154,329 @@ li {
 }
 
 @keyframes bounce2 {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-10px); }
-    60% { transform: translateY(-5px); }
+
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-10px);
+    }
+
+    60% {
+        transform: translateY(-5px);
+    }
+
 }
+
+
+/* =============================== */
+/* CLASSE OCULTAR */
+/* =============================== */
 
 .hidden {
     display: none !important;
+}
+
+
+/* =============================== */
+/* TELA DO JOGO */
+/* =============================== */
+
+#game-screen {
+    flex-grow: 1;
+
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+
+/* =============================== */
+/* HUD */
+/* =============================== */
+
+#hud {
+    position: fixed;
+
+    top: 15px;
+    left: 20px;
+    right: 20px;
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 25px;
+
+    z-index: 100;
+
+    flex-wrap: wrap;
+}
+
+.hud-item {
+    background: rgba(0, 0, 0, 0.75);
+
+    border: 1px solid #25D9FF;
+
+    border-radius: 8px;
+
+    padding: 12px 18px;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    box-shadow: 0 0 10px rgba(37, 217, 255, 0.5);
+
+    text-shadow: 0 0 5px #25D9FF;
+}
+
+#score-display {
+    color: #25D9FF;
+}
+
+#highscore-display {
+    color: #FF3DDE;
+}
+
+#level-display {
+    color: #2cff25;
+}
+
+#time-display {
+    color: #ffcc00;
+}
+
+#lives-display {
+    color: #ff3d3d;
+}
+
+
+/* =============================== */
+/* CANVAS */
+/* =============================== */
+
+#gameCanvas {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+}
+
+
+/* =============================== */
+/* MOSQUITO */
+/* =============================== */
+
+#mosquito {
+    position: absolute;
+
+    cursor: pointer;
+
+    z-index: 50;
+
+    user-select: none;
+
+    transition: width 0.2s ease;
+}
+
+
+/* =============================== */
+/* OVERLAY GAME OVER */
+/* =============================== */
+
+.overlay {
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    background: rgba(0, 0, 0, 0.9);
+
+    border: 2px solid #25D9FF;
+
+    box-shadow:
+        0 0 20px #25D9FF,
+        0 0 40px #FF3DDE;
+
+    border-radius: 15px;
+
+    padding: 40px;
+
+    text-align: center;
+
+    z-index: 999;
+
+    min-width: 350px;
+}
+
+.overlay h2 {
+    color: #2cff25;
+
+    margin-bottom: 20px;
+
+    font-size: 28px;
+
+    text-shadow: 0 0 10px #2cff25;
+}
+
+.overlay p {
+    margin-bottom: 25px;
+
+    color: white;
+
+    font-size: 16px;
+}
+
+.overlay button {
+    display: block;
+
+    width: 100%;
+
+    margin-top: 12px;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: linear-gradient(
+        90deg,
+        #d47e1c,
+        #2cff25
+    );
+
+    color: white;
+
+    font-family: 'Orbitron', sans-serif;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.overlay button:hover {
+    transform: scale(1.05);
+
+    box-shadow: 0 0 15px #25D9FF;
+}
+
+
+/* =============================== */
+/* AVISO DE NÍVEL */
+/* =============================== */
+
+.level-up-message {
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    color: #2cff25;
+
+    font-size: 36px;
+
+    font-weight: 900;
+
+    text-shadow:
+        0 0 10px #2cff25,
+        0 0 20px #25D9FF;
+
+    z-index: 1000;
+
+    pointer-events: none;
+
+    animation: levelAnimation 1.5s ease forwards;
+}
+
+@keyframes levelAnimation {
+
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+}
+#mosquito {
+    position: fixed;
+    z-index: 9999;
+    width: 80px;
+    height: auto;
+    user-select: none;
+}
+
+.mosquito1 {
+    width: 60px !important;
+}
+
+.mosquito2 {
+    width: 80px !important;
+}
+
+.mosquito3 {
+    width: 110px !important;
+}
+
+.ladoA {
+    transform: scaleX(1);
+}
+
+.ladoB {
+    transform: scaleX(-1);
+}
+#mosquito {
+    position: fixed !important;
+    display: block !important;
+    width: 80px !important;
+    height: auto !important;
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+}
+
+.mosquito1 {
+    width: 60px !important;
+}
+
+.mosquito2 {
+    width: 80px !important;
+}
+
+.mosquito3 {
+    width: 110px !important;
+}
+
+.ladoA {
+    transform: scaleX(1);
+}
+
+.ladoB {
+    transform: scaleX(-1);
 }

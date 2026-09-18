@@ -1,25 +1,19 @@
-// alert("Ola mundo")
+function jogar() {
+    const lobby = document.getElementById("lobby-screen");
+    const game = document.getElementById("game-screen");
 
-// alert(window.innerWidth)
-// alert(window.innerHeight)
+    if (lobby) {
+        lobby.classList.add("hidden");
+    }
 
+    if (game) {
+        game.classList.remove("hidden");
+    }
 
-const w = document.querySelector("#largura")
-const h = document.querySelector("#altura")
-const imgMosquito = document.querySelector(".img-Mosquito")
-
-
-function mudarPosicaoMosquito()
-{
-imgMosquito.style.top = Math.ceil(Math.random() * window.innerHeight) + "px"
-imgMosquito.style.left = Math.ceil(Math.random() * window.innerWidth) + "px"
+    // Inicia o jogo
+    if (typeof iniciarJogo === "function") {
+        iniciarJogo();
+    } else if (typeof reiniciarIntervaloMosquito === "function") {
+        reiniciarIntervaloMosquito();
+    }
 }
-
-setInterval(mudarPosicaoMosquito, 1000)
-
-imgMosquito.addEventListener("click", function(){
-    alert("Você clicou!")
-})
-
-w.textContent = window.innerWidth
-h.textContent = window.innerHeight
