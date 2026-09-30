@@ -1,16 +1,11 @@
-/*
-=========================================================
-FIREBASE
-=========================================================
-
-COLOQUE AQUI OS DADOS DO SEU PROJETO FIREBASE.
-
-Depois de criar o projeto, o Firebase fornece esse objeto.
-*/
+/* =========================================================
+   CONFIGURAÇÃO DO FIREBASE
+========================================================= */
 
 const firebaseConfig = {
 
-    apiKey: "COLE_SUA_API_KEY_AQUI",
+    apiKey:
+        "COLE_SUA_API_KEY_AQUI",
 
     authDomain:
         "SEU-PROJETO.firebaseapp.com",
@@ -32,34 +27,89 @@ const firebaseConfig = {
 };
 
 
-/*
-=========================================================
-INICIALIZAÇÃO
-=========================================================
-*/
+/* =========================================================
+   INICIALIZAÇÃO DO FIREBASE
+========================================================= */
 
 let firebaseOnline = false;
 
-try {
+window.firebaseDB = null;
 
-    firebase.initializeApp(firebaseConfig);
 
-    window.firebaseDB =
-        firebase.database();
+const firebaseNaoConfigurado =
+    !firebaseConfig.apiKey ||
+    firebaseConfig.apiKey ===
+        "COLE_SUA_API_KEY_AQUI" ||
 
-    firebaseOnline = true;
+    firebaseConfig.authDomain.includes(
+        "SEU-PROJETO"
+    ) ||
 
-    console.log(
-        "Firebase conectado."
-    );
+    firebaseConfig.databaseURL.includes(
+        "SEU-PROJETO"
+    ) ||
 
-} catch (erro) {
+    firebaseConfig.projectId ===
+        "SEU-PROJETO" ||
 
-    console.warn(
-        "Firebase não configurado.",
-        erro
-    );
+    firebaseConfig.messagingSenderId ===
+        "SEU_MESSAGING_SENDER_ID" ||
+
+    firebaseConfig.appId ===
+        "SEU_APP_ID";
+
+
+if (
+    !firebaseNaoConfigurado &&
+    typeof firebase !== "undefined"
+) {
+
+    try {
+
+        if (
+            !firebase.apps ||
+            firebase.apps.length === 0
+        ) {
+
+            firebase.initializeApp(
+                firebaseConfig
+            );
+        }
+
+
+        window.firebaseDB =
+            firebase.database();
+
+
+        firebaseOnline = true;
+
+
+        console.log(
+            "Firebase conectado com sucesso."
+        );
+
+
+    } catch (erro) {
+
+        firebaseOnline = false;
+
+        window.firebaseDB = null;
+
+
+        console.warn(
+            "Não foi possível conectar ao Firebase.",
+            erro
+        );
+    }
+
+} else {
+
+    firebaseOnline = false;
 
     window.firebaseDB = null;
 
+
+    console.log(
+        "Firebase ainda não configurado."
+    );
 }

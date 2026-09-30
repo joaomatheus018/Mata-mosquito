@@ -1,15 +1,10 @@
-/*
-=========================================================
-VARIÁVEIS
-=========================================================
-*/
+/* =========================================================
+   VARIÁVEIS
+========================================================= */
 
 let vidas = 3;
-
 let pontos = 0;
-
 let nivel = 1;
-
 let tempo = 60;
 
 let jogoAtivo = false;
@@ -17,248 +12,210 @@ let jogoAtivo = false;
 let mosquitoAtual = null;
 
 let mosquitoTimer = null;
-
 let cronometroTimer = null;
 
 let tempoMosquito = 1500;
 
-let recordeLocal =
-    Number(
-        localStorage.getItem(
-            "mosquito_recorde"
-        ) || 0
-    );
+let recordeLocal = Number(
+    localStorage.getItem("mosquito_recorde") || 0
+);
 
 
-/*
-=========================================================
-FUNDOS
-=========================================================
-*/
+/* =========================================================
+   FUNDOS
+========================================================= */
 
 const fundos = [
-
     'url("img/Fundo 1.png")',
-
     'url("img/fundo 2.png")',
-
     'url("img/fundo 3.png")',
-
     'url("img/fundo 4.png")'
-
 ];
 
 
-/*
-=========================================================
-INICIAR
-=========================================================
-*/
+/* =========================================================
+   INICIAR JOGO
+========================================================= */
 
 function iniciarJogo() {
 
-    clearInterval(
-        mosquitoTimer
-    );
+    clearInterval(mosquitoTimer);
+    clearInterval(cronometroTimer);
 
-    clearInterval(
-        cronometroTimer
-    );
+    mosquitoTimer = null;
+    cronometroTimer = null;
 
+    if (mosquitoAtual) {
+        mosquitoAtual.remove();
+        mosquitoAtual = null;
+    }
+
+    if (typeof pararControleMao === "function") {
+        try {
+            pararControleMao();
+        } catch (erro) {
+            console.warn("Erro ao parar controle da mão:", erro);
+        }
+    }
 
     vidas = 3;
-
     pontos = 0;
-
     nivel = 1;
-
     tempo = 60;
-
     tempoMosquito = 1500;
 
     jogoAtivo = true;
 
-
     const lobby =
-        document.getElementById(
-            "lobby-screen"
-        );
+        document.getElementById("lobby-screen");
 
     const game =
-        document.getElementById(
-            "game-screen"
-        );
+        document.getElementById("game-screen");
 
+    if (lobby) {
+        lobby.classList.add("hidden");
+    }
 
-    lobby.classList.add(
-        "hidden"
-    );
-
-    game.classList.remove(
-        "hidden"
-    );
-
+    if (game) {
+        game.classList.remove("hidden");
+    }
 
     document.body.style.backgroundImage =
         fundos[0];
 
-
     esconderOverlay();
-
 
     atualizarHUD();
 
-
     iniciarCronometro();
 
-
     criarIntervaloMosquito();
-
 
     criarMosquito();
 
 
-    /*
-    =============================================
-    MODO MÃO
-    =============================================
-    */
+    /* =====================================================
+       MODO MÃO
+    ===================================================== */
+
+    const camera =
+        document.getElementById("camera-container");
+
+    const cursor =
+        document.getElementById("hand-cursor");
 
     if (
-        typeof modoControle !==
-        "undefined" &&
+        typeof modoControle !== "undefined" &&
         modoControle === "mao"
     ) {
 
-        document
-            .getElementById(
-                "camera-container"
-            )
-            .classList.remove(
-                "hidden"
-            );
-
-        document
-            .getElementById(
-                "hand-cursor"
-            )
-            .classList.remove(
-                "hidden"
-            );
-
-
-        if (
-            typeof iniciarControleMao ===
-            "function"
-        ) {
-
-            iniciarControleMao();
-
+        if (camera) {
+            camera.classList.remove("hidden");
         }
 
-    }
+        if (cursor) {
+            cursor.classList.remove("hidden");
+        }
 
+        if (typeof iniciarControleMao === "function") {
+            iniciarControleMao();
+        }
+
+    } else {
+
+        if (camera) {
+            camera.classList.add("hidden");
+        }
+
+        if (cursor) {
+            cursor.classList.add("hidden");
+        }
+    }
 }
 
 
-/*
-=========================================================
-CRONÔMETRO
-=========================================================
-*/
+/* =========================================================
+   CRONÔMETRO
+========================================================= */
 
 function iniciarCronometro() {
 
-    cronometroTimer =
-        setInterval(
-            function () {
+    clearInterval(cronometroTimer);
 
-                if (!jogoAtivo) {
-                    return;
-                }
+    cronometroTimer = setInterval(function () {
 
+        if (!jogoAtivo) {
+            return;
+        }
 
-                tempo--;
+        tempo--;
 
+        atualizarHUD();
 
-                atualizarHUD();
+        if (tempo <= 0) {
 
+            finalizarJogo(
+                "TEMPO ESGOTADO",
+                "O seu tempo acabou!"
+            );
+        }
 
-                if (tempo <= 0) {
-
-                    finalizarJogo(
-                        "TEMPO ESGOTADO",
-                        "O seu tempo acabou!"
-                    );
-
-                }
-
-            },
-            1000
-        );
-
+    }, 1000);
 }
 
 
-/*
-=========================================================
-CRIAR INTERVALO
-=========================================================
-*/
+/* =========================================================
+   INTERVALO DO MOSQUITO
+========================================================= */
 
 function criarIntervaloMosquito() {
 
-    clearInterval(
-        mosquitoTimer
-    );
+    clearInterval(mosquitoTimer);
 
+    let tempoAtual = tempoMosquito;
 
-    mosquitoTimer =
-        setInterval(
-            function () {
+    /*
+    No modo mão o mosquito fica
+    1.8x mais tempo na tela.
+    */
 
-                if (!jogoAtivo) {
-                    return;
-                }
+    if (
+        typeof modoControle !== "undefined" &&
+        modoControle === "mao"
+    ) {
 
+        tempoAtual =
+            tempoMosquito * 1.8;
+    }
 
-                /*
-                Se o mosquito antigo ainda
-                estiver na tela, o jogador
-                não conseguiu pegá-lo.
-                */
+    mosquitoTimer = setInterval(function () {
 
-                if (mosquitoAtual) {
+        if (!jogoAtivo) {
+            return;
+        }
 
-                    mosquitoAtual.remove();
+        if (mosquitoAtual) {
 
-                    mosquitoAtual =
-                        null;
+            mosquitoAtual.remove();
 
+            mosquitoAtual = null;
 
-                    perderVida();
+            perderVida();
 
-                    if (!jogoAtivo) {
-                        return;
-                    }
+            if (!jogoAtivo) {
+                return;
+            }
+        }
 
-                }
+        criarMosquito();
 
-
-                criarMosquito();
-
-            },
-            tempoMosquito
-        );
-
+    }, tempoAtual);
 }
 
 
-/*
-=========================================================
-CRIAR MOSQUITO
-=========================================================
-*/
+/* =========================================================
+   CRIAR MOSQUITO
+========================================================= */
 
 function criarMosquito() {
 
@@ -266,39 +223,29 @@ function criarMosquito() {
         return;
     }
 
-
     if (mosquitoAtual) {
 
         mosquitoAtual.remove();
 
         mosquitoAtual = null;
-
     }
 
-
     const mosquito =
-        document.createElement(
-            "img"
-        );
-
+        document.createElement("img");
 
     mosquito.src =
         "img/mosquito.png";
 
-
     mosquito.className =
         "mosquito";
-
 
     mosquito.id =
         "mosquito";
 
 
-    /*
-    =============================================
-    TAMANHO
-    =============================================
-    */
+    /* =====================================================
+       TAMANHO
+    ===================================================== */
 
     let tamanho = 110;
 
@@ -318,32 +265,30 @@ function criarMosquito() {
         tamanho = 70;
     }
 
+    if (nivel >= 7) {
+        tamanho = 60;
+    }
+
+    if (nivel >= 10) {
+        tamanho = 50;
+    }
 
     mosquito.style.width =
         tamanho + "px";
 
 
-    /*
-    =============================================
-    POSIÇÃO
-    =============================================
-    */
+    /* =====================================================
+       POSIÇÃO
+    ===================================================== */
 
-    const margemX =
-        40;
-
-    const margemTopo =
-        110;
-
-    const margemBaixo =
-        40;
-
+    const margemX = 40;
+    const margemTopo = 110;
+    const margemBaixo = 40;
 
     const largura =
         window.innerWidth -
         tamanho -
         margemX;
-
 
     const altura =
         window.innerHeight -
@@ -351,56 +296,39 @@ function criarMosquito() {
         margemTopo -
         margemBaixo;
 
-
     const x =
         Math.max(
             margemX,
             Math.random() *
-            Math.max(
-                largura,
-                100
-            )
+            Math.max(largura, 100)
         );
-
 
     const y =
         margemTopo +
         Math.random() *
-        Math.max(
-            altura,
-            100
-        );
-
+        Math.max(altura, 100);
 
     mosquito.style.left =
         x + "px";
-
 
     mosquito.style.top =
         y + "px";
 
 
-    /*
-    =============================================
-    DIREÇÃO
-    =============================================
-    */
+    /* =====================================================
+       DIREÇÃO
+    ===================================================== */
 
-    if (
-        Math.random() > 0.5
-    ) {
+    if (Math.random() > 0.5) {
 
         mosquito.style.transform =
             "scaleX(-1)";
-
     }
 
 
-    /*
-    =============================================
-    MOUSE
-    =============================================
-    */
+    /* =====================================================
+       MOUSE
+    ===================================================== */
 
     mosquito.addEventListener(
         "click",
@@ -408,40 +336,30 @@ function criarMosquito() {
 
             evento.stopPropagation();
 
-
-            if (
-                modoControle ===
-                "mouse"
-            ) {
-
+            if (modoControle === "mouse") {
                 capturarMosquito();
-
             }
-
         }
     );
 
 
-    document
-        .getElementById(
-            "game-area"
-        )
-        .appendChild(
-            mosquito
-        );
+    const area =
+        document.getElementById("game-area");
 
+    if (!area) {
+        return;
+    }
+
+    area.appendChild(mosquito);
 
     mosquitoAtual =
         mosquito;
-
 }
 
 
-/*
-=========================================================
-CAPTURAR MOSQUITO
-=========================================================
-*/
+/* =========================================================
+   CAPTURAR MOSQUITO
+========================================================= */
 
 function capturarMosquito() {
 
@@ -449,37 +367,25 @@ function capturarMosquito() {
         return;
     }
 
-
     if (!mosquitoAtual) {
         return;
     }
 
-
-    mosquitoAtual.classList.add(
-        "dead"
-    );
-
-
     const mosquitoCapturado =
         mosquitoAtual;
 
-
     mosquitoAtual = null;
 
+    mosquitoCapturado.classList.add("dead");
 
     pontos++;
 
 
-    /*
-    =============================================
-    RECORD LOCAL
-    =============================================
-    */
+    /* =====================================================
+       RECORDE
+    ===================================================== */
 
-    if (
-        pontos >
-        recordeLocal
-    ) {
+    if (pontos > recordeLocal) {
 
         recordeLocal =
             pontos;
@@ -488,117 +394,82 @@ function capturarMosquito() {
             "mosquito_recorde",
             recordeLocal
         );
-
     }
 
 
     atualizarNivel();
 
-
     atualizarHUD();
 
 
-    /*
-    Remove o mosquito depois
-    da animação.
-    */
+    setTimeout(function () {
 
-    setTimeout(
-        function () {
+        if (
+            mosquitoCapturado &&
+            mosquitoCapturado.parentNode
+        ) {
 
-            if (
-                mosquitoCapturado
-                .parentNode
-            ) {
+            mosquitoCapturado.remove();
+        }
 
-                mosquitoCapturado
-                    .remove();
-
-            }
-
-        },
-        150
-    );
+    }, 150);
 
 
-    /*
-    Cria outro imediatamente.
-    */
+    setTimeout(function () {
 
-    setTimeout(
-        function () {
+        if (jogoAtivo) {
+            criarMosquito();
+        }
 
-            if (jogoAtivo) {
-
-                criarMosquito();
-
-            }
-
-        },
-        100
-    );
-
+    }, 100);
 }
 
 
-/*
-=========================================================
-NÍVEL / DIFICULDADE
-=========================================================
-*/
+/* =========================================================
+   NÍVEL / DIFICULDADE
+========================================================= */
 
 function atualizarNivel() {
 
     /*
-    A cada 25 pontos:
-    sobe um nível.
+    A cada 25 pontos sobe um nível.
     */
 
     const novoNivel =
-        Math.floor(
-            pontos / 25
-        ) + 1;
+        Math.floor(pontos / 25) + 1;
 
-
-    if (
-        novoNivel >
-        nivel
-    ) {
-
-        nivel =
-            novoNivel;
-
-
-        mudarFundo();
-
-
-        /*
-        Mais dificuldade.
-        */
-
-        tempoMosquito =
-            Math.max(
-                350,
-                1500 -
-                ((nivel - 1) * 180)
-            );
-
-
-        criarIntervaloMosquito();
-
-
-        mostrarNivel();
-
+    if (novoNivel <= nivel) {
+        return;
     }
 
+    nivel =
+        novoNivel;
+
+
+    /* Troca o fundo */
+
+    mudarFundo();
+
+
+    /* Aumenta dificuldade */
+
+    tempoMosquito =
+        Math.max(
+            350,
+            1500 -
+            ((nivel - 1) * 180)
+        );
+
+
+    criarIntervaloMosquito();
+
+    mostrarNivel();
 }
 
 
-/*
-=========================================================
-MUDAR FUNDO
-=========================================================
-*/
+/* =========================================================
+   MUDAR FUNDO
+========================================================= */
 
 function mudarFundo() {
 
@@ -606,57 +477,43 @@ function mudarFundo() {
         (nivel - 1) %
         fundos.length;
 
-
     document.body.style.backgroundImage =
         fundos[indice];
-
 }
 
 
-/*
-=========================================================
-AVISO DE NÍVEL
-=========================================================
-*/
+/* =========================================================
+   AVISO DE NÍVEL
+========================================================= */
 
 function mostrarNivel() {
 
     const aviso =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     aviso.className =
         "level-up-message";
 
-
     aviso.textContent =
         "NÍVEL " + nivel;
-
 
     document.body.appendChild(
         aviso
     );
 
+    setTimeout(function () {
 
-    setTimeout(
-        function () {
-
+        if (aviso.parentNode) {
             aviso.remove();
+        }
 
-        },
-        1500
-    );
-
+    }, 1500);
 }
 
 
-/*
-=========================================================
-PERDER VIDA
-=========================================================
-*/
+/* =========================================================
+   PERDER VIDA
+========================================================= */
 
 function perderVida() {
 
@@ -664,12 +521,9 @@ function perderVida() {
         return;
     }
 
-
     vidas--;
 
-
     atualizarHUD();
-
 
     if (vidas <= 0) {
 
@@ -677,17 +531,13 @@ function perderVida() {
             "GAME OVER",
             "Você perdeu todas as suas vidas!"
         );
-
     }
-
 }
 
 
-/*
-=========================================================
-HUD
-=========================================================
-*/
+/* =========================================================
+   HUD
+========================================================= */
 
 function atualizarHUD() {
 
@@ -718,41 +568,28 @@ function atualizarHUD() {
 
 
     if (score) {
-
         score.textContent =
             pontos;
-
     }
-
 
     if (highscore) {
-
         highscore.textContent =
             recordeLocal;
-
     }
-
 
     if (level) {
-
         level.textContent =
             nivel;
-
     }
-
 
     if (time) {
-
         time.textContent =
             tempo;
-
     }
-
 
     if (lives) {
 
         let coracoes = "";
-
 
         for (
             let i = 0;
@@ -760,25 +597,18 @@ function atualizarHUD() {
             i++
         ) {
 
-            coracoes +=
-                "❤️";
-
+            coracoes += "❤️";
         }
-
 
         lives.textContent =
             coracoes || "💔";
-
     }
-
 }
 
 
-/*
-=========================================================
-FINALIZAR JOGO
-=========================================================
-*/
+/* =========================================================
+   FINALIZAR JOGO
+========================================================= */
 
 function finalizarJogo(
     titulo,
@@ -789,9 +619,7 @@ function finalizarJogo(
         return;
     }
 
-
     jogoAtivo = false;
-
 
     clearInterval(
         cronometroTimer
@@ -801,27 +629,31 @@ function finalizarJogo(
         mosquitoTimer
     );
 
+    cronometroTimer = null;
+    mosquitoTimer = null;
+
 
     if (mosquitoAtual) {
 
         mosquitoAtual.remove();
 
         mosquitoAtual = null;
-
     }
 
-
-    /*
-    Para câmera.
-    */
 
     if (
         typeof pararControleMao ===
         "function"
     ) {
 
-        pararControleMao();
-
+        try {
+            pararControleMao();
+        } catch (erro) {
+            console.warn(
+                "Erro ao parar câmera:",
+                erro
+            );
+        }
     }
 
 
@@ -835,21 +667,14 @@ function finalizarJogo(
             "hand-cursor"
         );
 
+    if (camera) {
+        camera.classList.add("hidden");
+    }
 
-    camera.classList.add(
-        "hidden"
-    );
+    if (cursor) {
+        cursor.classList.add("hidden");
+    }
 
-    cursor.classList.add(
-        "hidden"
-    );
-
-
-    /*
-    =============================================
-    OVERLAY
-    =============================================
-    */
 
     const overlay =
         document.getElementById(
@@ -872,108 +697,71 @@ function finalizarJogo(
         );
 
 
-    title.textContent =
-        titulo;
+    if (title) {
+        title.textContent =
+            titulo;
+    }
 
-    msg.textContent =
-        mensagem;
+    if (msg) {
+        msg.textContent =
+            mensagem;
+    }
 
-    finalScore.textContent =
-        pontos;
+    if (finalScore) {
+        finalScore.textContent =
+            pontos;
+    }
 
-
-    /*
-    =============================================
-    NOVO RECORDE
-    =============================================
-    */
 
     const recordMessage =
         document.getElementById(
             "record-message"
         );
 
+    if (recordMessage) {
 
-    if (
-        pontos === recordeLocal &&
-        pontos > 0
-    ) {
+        if (
+            pontos === recordeLocal &&
+            pontos > 0
+        ) {
 
-        recordMessage.classList.remove(
-            "hidden"
-        );
+            recordMessage.classList.remove(
+                "hidden"
+            );
 
-    } else {
+        } else {
 
-        recordMessage.classList.add(
-            "hidden"
-        );
-
+            recordMessage.classList.add(
+                "hidden"
+            );
+        }
     }
 
 
-    overlay.classList.remove(
-        "hidden"
-    );
+    if (overlay) {
+        overlay.classList.remove(
+            "hidden"
+        );
+    }
 
 
-    /*
-    =============================================
-    ENVIA PARA RANKING
-    =============================================
-    */
+    if (
+        typeof salvarPontuacaoOnline ===
+        "function"
+    ) {
 
-    salvarPontuacaoOnline();
-
+        salvarPontuacaoOnline();
+    }
 }
 
 
-/*
-=========================================================
-REINICIAR
-=========================================================
-*/
+/* =========================================================
+   REINICIAR
+========================================================= */
 
 function reiniciarJogo() {
 
-    esconderOverlay();
-
-    iniciarJogo();
-
-}
-
-
-/*
-=========================================================
-ESCONDER OVERLAY
-=========================================================
-*/
-
-function esconderOverlay() {
-
-    const overlay =
-        document.getElementById(
-            "game-overlay"
-        );
-
-
-    overlay.classList.add(
-        "hidden"
-    );
-
-}
-
-
-/*
-=========================================================
-VOLTAR AO MENU
-=========================================================
-*/
-
-function voltarAoMenu() {
-
     jogoAtivo = false;
-
 
     clearInterval(
         cronometroTimer
@@ -983,13 +771,15 @@ function voltarAoMenu() {
         mosquitoTimer
     );
 
+    cronometroTimer = null;
+    mosquitoTimer = null;
+
 
     if (mosquitoAtual) {
 
         mosquitoAtual.remove();
 
         mosquitoAtual = null;
-
     }
 
 
@@ -998,27 +788,110 @@ function voltarAoMenu() {
         "function"
     ) {
 
-        pararControleMao();
-
+        try {
+            pararControleMao();
+        } catch (erro) {
+            console.warn(
+                "Erro ao reiniciar câmera:",
+                erro
+            );
+        }
     }
 
 
-    document
-        .getElementById(
+    esconderOverlay();
+
+
+    setTimeout(function () {
+
+        iniciarJogo();
+
+    }, 300);
+}
+
+
+/* =========================================================
+   ESCONDER OVERLAY
+========================================================= */
+
+function esconderOverlay() {
+
+    const overlay =
+        document.getElementById(
+            "game-overlay"
+        );
+
+    if (overlay) {
+
+        overlay.classList.add(
+            "hidden"
+        );
+    }
+}
+
+
+/* =========================================================
+   VOLTAR AO MENU
+========================================================= */
+
+function voltarAoMenu() {
+
+    jogoAtivo = false;
+
+    clearInterval(
+        cronometroTimer
+    );
+
+    clearInterval(
+        mosquitoTimer
+    );
+
+    cronometroTimer = null;
+    mosquitoTimer = null;
+
+
+    if (mosquitoAtual) {
+
+        mosquitoAtual.remove();
+
+        mosquitoAtual = null;
+    }
+
+
+    if (
+        typeof pararControleMao ===
+        "function"
+    ) {
+
+        try {
+            pararControleMao();
+        } catch (erro) {
+            console.warn(
+                "Erro ao parar câmera:",
+                erro
+            );
+        }
+    }
+
+
+    const game =
+        document.getElementById(
             "game-screen"
-        )
-        .classList.add(
-            "hidden"
         );
 
-
-    document
-        .getElementById(
+    const lobby =
+        document.getElementById(
             "lobby-screen"
-        )
-        .classList.remove(
-            "hidden"
         );
+
+
+    if (game) {
+        game.classList.add("hidden");
+    }
+
+    if (lobby) {
+        lobby.classList.remove("hidden");
+    }
 
 
     document.body.style.backgroundImage =
@@ -1028,255 +901,11 @@ function voltarAoMenu() {
     esconderOverlay();
 
 
-    carregarRankingOnline();
-
-}
-
-
-/*
-=========================================================
-RANKING ONLINE
-=========================================================
-*/
-
-function salvarPontuacaoOnline() {
-
     if (
-        !window.firebaseDB
+        typeof carregarRankingOnline ===
+        "function"
     ) {
 
-        console.warn(
-            "Firebase não configurado."
-        );
-
-        return;
-
+        carregarRankingOnline();
     }
-
-
-    if (pontos <= 0) {
-        return;
-    }
-
-
-    const nome =
-        window.playerName ||
-        "Player";
-
-
-    const referencia =
-        window.firebaseDB
-            .ref("ranking")
-            .push();
-
-
-    referencia
-        .set({
-
-            nome: nome,
-
-            score: pontos,
-
-            nivel: nivel,
-
-            modo:
-                modoControle,
-
-            data:
-                Date.now()
-
-        })
-        .then(
-            function () {
-
-                console.log(
-                    "Pontuação enviada."
-                );
-
-                carregarRankingOnline();
-
-            }
-        )
-        .catch(
-            function (erro) {
-
-                console.error(
-                    "Erro ao salvar:",
-                    erro
-                );
-
-            }
-        );
-
-}
-
-
-/*
-=========================================================
-CARREGAR RANKING
-=========================================================
-*/
-
-function carregarRankingOnline() {
-
-    const lista =
-        document.getElementById(
-            "ranking-list"
-        );
-
-
-    if (!lista) {
-        return;
-    }
-
-
-    if (
-        !window.firebaseDB
-    ) {
-
-        lista.innerHTML = `
-
-            <div class="ranking-loading">
-                Ranking online não configurado
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    const referencia =
-        window.firebaseDB
-            .ref("ranking")
-            .orderByChild("score")
-            .limitToLast(10);
-
-
-    referencia.on(
-        "value",
-        function (snapshot) {
-
-            const jogadores = [];
-
-
-            snapshot.forEach(
-                function (item) {
-
-                    jogadores.push(
-                        item.val()
-                    );
-
-                }
-            );
-
-
-            jogadores.sort(
-                function (a, b) {
-
-                    return b.score -
-                        a.score;
-
-                }
-            );
-
-
-            jogadores.splice(
-                10
-            );
-
-
-            if (
-                jogadores.length === 0
-            ) {
-
-                lista.innerHTML = `
-
-                    <div class="ranking-loading">
-                        Ainda não há pontuações.
-                    </div>
-
-                `;
-
-                return;
-
-            }
-
-
-            lista.innerHTML = "";
-
-
-            jogadores.forEach(
-                function (
-                    jogador,
-                    index
-                ) {
-
-                    const row =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    row.className =
-                        "ranking-row";
-
-
-                    row.innerHTML = `
-
-                        <div class="ranking-position">
-                            ${index + 1}
-                        </div>
-
-                        <div class="ranking-name">
-                            ${escaparHTML(
-                                jogador.nome ||
-                                "Player"
-                            )}
-                        </div>
-
-                        <div class="ranking-score">
-                            ${Number(
-                                jogador.score ||
-                                0
-                            )} pts
-                        </div>
-
-                    `;
-
-
-                    lista.appendChild(
-                        row
-                    );
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-/*
-=========================================================
-SEGURANÇA DO TEXTO DO RANKING
-=========================================================
-*/
-
-function escaparHTML(texto) {
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    div.textContent =
-        texto;
-
-
-    return div.innerHTML;
-
 }

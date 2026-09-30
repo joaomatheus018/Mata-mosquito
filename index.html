@@ -18,9 +18,9 @@
 
 <body>
 
-    <!-- ================================================= -->
+    <!-- ========================= -->
     <!-- LOBBY -->
-    <!-- ================================================= -->
+    <!-- ========================= -->
 
     <main id="lobby-screen">
 
@@ -36,8 +36,6 @@
                 Escolha como você quer jogar
             </p>
 
-            <!-- NOME -->
-
             <div class="input-group">
 
                 <label for="player-name">
@@ -52,8 +50,6 @@
                     autocomplete="off">
 
             </div>
-
-            <!-- MODO DE JOGO -->
 
             <div class="mode-title">
                 MODO DE CONTROLE
@@ -81,7 +77,6 @@
 
                 </button>
 
-
                 <button
                     id="hand-mode"
                     class="mode-card"
@@ -104,8 +99,6 @@
 
             </div>
 
-            <!-- BOTÃO -->
-
             <button
                 id="btn-jogar"
                 type="button"
@@ -116,16 +109,12 @@
 
             </button>
 
-
-            <!-- RANKING -->
-
             <section class="ranking">
 
                 <div class="ranking-header">
 
                     <div>
-                        🏆
-                        TOP CAÇADORES
+                        🏆 TOP CAÇADORES
                     </div>
 
                     <span>
@@ -149,15 +138,13 @@
     </main>
 
 
-    <!-- ================================================= -->
+    <!-- ========================= -->
     <!-- JOGO -->
-    <!-- ================================================= -->
+    <!-- ========================= -->
 
     <main
         id="game-screen"
         class="hidden">
-
-        <!-- HUD -->
 
         <div id="hud">
 
@@ -199,13 +186,7 @@
         </div>
 
 
-        <!-- ÁREA DO JOGO -->
-
-        <div id="game-area">
-
-            <!-- Mosquito será criado aqui -->
-
-        </div>
+        <div id="game-area"></div>
 
 
         <!-- CÂMERA -->
@@ -221,8 +202,7 @@
                 playsinline>
             </video>
 
-            <div
-                id="hand-status">
+            <div id="hand-status">
                 ✋ Mostre sua mão
             </div>
 
@@ -242,7 +222,7 @@
         </div>
 
 
-        <!-- OVERLAY -->
+        <!-- GAME OVER -->
 
         <div
             id="game-overlay"
@@ -302,23 +282,20 @@
         </div>
 
 
-        <!-- BOTÃO SAIR -->
-
         <button
             id="btn-sair"
             onclick="voltarAoMenu()">
 
-            ✕
-            MENU
+            ✕ MENU
 
         </button>
 
     </main>
 
 
-    <!-- ================================================= -->
+    <!-- ========================= -->
     <!-- MEDIAPIPE -->
-    <!-- ================================================= -->
+    <!-- ========================= -->
 
     <script
         src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
@@ -341,9 +318,9 @@
     </script>
 
 
-    <!-- ================================================= -->
+    <!-- ========================= -->
     <!-- FIREBASE -->
-    <!-- ================================================= -->
+    <!-- ========================= -->
 
     <script
         src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js">
@@ -354,16 +331,12 @@
     </script>
 
 
-    <!-- ================================================= -->
-    <!-- JAVASCRIPT DO JOGO -->
-    <!-- ================================================= -->
+    <!-- ========================= -->
+    <!-- SEUS JS -->
+    <!-- ========================= -->
 
-    <script src="js/firebase-config.js"></script>
-
-    <script src="js/hand.js"></script>
-
+    <script src="js/config.js"></script>
     <script src="js/game.js"></script>
-
     <script src="js/script.js"></script>
 
 </body>
