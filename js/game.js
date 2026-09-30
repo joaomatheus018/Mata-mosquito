@@ -1,5 +1,11 @@
 /* =========================================================
-   VARIÁVEIS
+   MATA MOSQUITO
+   GAME.JS
+========================================================= */
+
+
+/* =========================================================
+   VARIÁVEIS DO JOGO
 ========================================================= */
 
 let vidas = 3;
@@ -14,7 +20,22 @@ let mosquitoAtual = null;
 let mosquitoTimer = null;
 let cronometroTimer = null;
 
-let tempoMosquito = 1500;
+
+/*
+=========================================================
+TEMPO DO MOSQUITO
+=========================================================
+
+O valor é o tempo que cada mosquito permanece
+na tela antes de fugir.
+
+Agora o tempo pertence ao mosquito atual.
+Isso evita o bug de um timer antigo matar
+o mosquito seguinte.
+*/
+
+let tempoMosquito = 1800;
+
 
 let recordeLocal = Number(
     localStorage.getItem("mosquito_recorde") || 0
@@ -39,177 +60,401 @@ const fundos = [
 
 function iniciarJogo() {
 
-    clearInterval(mosquitoTimer);
+    /*
+    Cancela timers antigos.
+    */
+
+    clearTimeout(mosquitoTimer);
     clearInterval(cronometroTimer);
 
     mosquitoTimer = null;
     cronometroTimer = null;
 
+
+    /*
+    Remove mosquito antigo.
+    */
+
     if (mosquitoAtual) {
+
         mosquitoAtual.remove();
+
         mosquitoAtual = null;
     }
 
-    if (typeof pararControleMao === "function") {
+
+    /*
+    Reinicia câmera/mão.
+    */
+
+    if (
+        typeof pararControleMao ===
+        "function"
+    ) {
+
         try {
+
             pararControleMao();
+
         } catch (erro) {
-            console.warn("Erro ao parar controle da mão:", erro);
+
+            console.warn(
+                "Erro ao parar controle da mão:",
+                erro
+            );
         }
     }
+
+
+    /*
+    Reinicia valores.
+    */
 
     vidas = 3;
     pontos = 0;
     nivel = 1;
     tempo = 60;
-    tempoMosquito = 1500;
+
+    /*
+    DIFICULDADE MAIS FÁCIL
+    */
+
+    tempoMosquito = 1800;
 
     jogoAtivo = true;
 
+
+    /*
+    Elementos do HTML.
+    */
+
     const lobby =
-        document.getElementById("lobby-screen");
+        document.getElementById(
+            "lobby-screen"
+        );
 
     const game =
-        document.getElementById("game-screen");
+        document.getElementById(
+            "game-screen"
+        );
+
+
+    /*
+    Esconde lobby.
+    */
 
     if (lobby) {
-        lobby.classList.add("hidden");
+
+        lobby.classList.add(
+            "hidden"
+        );
     }
 
+
+    /*
+    Mostra jogo.
+    */
+
     if (game) {
-        game.classList.remove("hidden");
+
+        game.classList.remove(
+            "hidden"
+        );
     }
+
+
+    /*
+    Começa com o primeiro fundo.
+    */
 
     document.body.style.backgroundImage =
         fundos[0];
 
+
+    /*
+    Esconde tela de game over.
+    */
+
     esconderOverlay();
+
+
+    /*
+    Atualiza HUD.
+    */
 
     atualizarHUD();
 
+
+    /*
+    Inicia contador de 60 segundos.
+    */
+
     iniciarCronometro();
 
-    criarIntervaloMosquito();
+
+    /*
+    Cria o primeiro mosquito.
+    */
 
     criarMosquito();
 
 
-    /* =====================================================
+    /*
+    =====================================================
        MODO MÃO
-    ===================================================== */
+    =====================================================
+    */
 
     const camera =
-        document.getElementById("camera-container");
+        document.getElementById(
+            "camera-container"
+        );
 
     const cursor =
-        document.getElementById("hand-cursor");
+        document.getElementById(
+            "hand-cursor"
+        );
+
 
     if (
-        typeof modoControle !== "undefined" &&
-        modoControle === "mao"
+        typeof modoControle !==
+        "undefined" &&
+        modoControle ===
+        "mao"
     ) {
 
         if (camera) {
-            camera.classList.remove("hidden");
+
+            camera.classList.remove(
+                "hidden"
+            );
         }
+
 
         if (cursor) {
-            cursor.classList.remove("hidden");
+
+            cursor.classList.remove(
+                "hidden"
+            );
         }
 
-        if (typeof iniciarControleMao === "function") {
+
+        if (
+            typeof iniciarControleMao ===
+            "function"
+        ) {
+
             iniciarControleMao();
         }
+
 
     } else {
 
         if (camera) {
-            camera.classList.add("hidden");
+
+            camera.classList.add(
+                "hidden"
+            );
         }
 
+
         if (cursor) {
-            cursor.classList.add("hidden");
+
+            cursor.classList.add(
+                "hidden"
+            );
         }
     }
 }
 
 
 /* =========================================================
-   CRONÔMETRO
+   CRONÔMETRO DO JOGO
 ========================================================= */
 
 function iniciarCronometro() {
 
-    clearInterval(cronometroTimer);
+    clearInterval(
+        cronometroTimer
+    );
 
-    cronometroTimer = setInterval(function () {
 
-        if (!jogoAtivo) {
-            return;
-        }
+    cronometroTimer =
+        setInterval(
+            function () {
 
-        tempo--;
+                if (!jogoAtivo) {
 
-        atualizarHUD();
+                    return;
+                }
 
-        if (tempo <= 0) {
 
-            finalizarJogo(
-                "TEMPO ESGOTADO",
-                "O seu tempo acabou!"
-            );
-        }
+                tempo--;
 
-    }, 1000);
+
+                atualizarHUD();
+
+
+                if (tempo <= 0) {
+
+                    finalizarJogo(
+                        "TEMPO ESGOTADO",
+                        "O seu tempo acabou!"
+                    );
+                }
+
+            },
+            1000
+        );
 }
 
 
 /* =========================================================
-   INTERVALO DO MOSQUITO
+   TIMER DO MOSQUITO
 ========================================================= */
+
+/*
+IMPORTANTE:
+
+Antes o jogo usava setInterval() para controlar
+todos os mosquitos.
+
+Isso fazia o timer continuar correndo mesmo depois
+que o mosquito era capturado.
+
+Agora usamos um setTimeout() separado para cada
+mosquito.
+
+Quando ele é capturado, esse timeout é cancelado.
+
+Isso corrige o bug de:
+
+"clicar no mosquito -> mosquito some -> perde vida"
+*/
 
 function criarIntervaloMosquito() {
 
-    clearInterval(mosquitoTimer);
+    /*
+    Cancela timer anterior.
+    */
 
-    let tempoAtual = tempoMosquito;
+    clearTimeout(
+        mosquitoTimer
+    );
+
+    mosquitoTimer = null;
+
+
+    if (!jogoAtivo) {
+
+        return;
+    }
+
 
     /*
-    No modo mão o mosquito fica
-    1.8x mais tempo na tela.
+    Define tempo do mosquito.
+    */
+
+    let tempoAtual =
+        tempoMosquito;
+
+
+    /*
+    No modo mão damos mais tempo.
     */
 
     if (
-        typeof modoControle !== "undefined" &&
-        modoControle === "mao"
+        typeof modoControle !==
+        "undefined" &&
+        modoControle ===
+        "mao"
     ) {
 
         tempoAtual =
             tempoMosquito * 1.8;
     }
 
-    mosquitoTimer = setInterval(function () {
 
-        if (!jogoAtivo) {
-            return;
-        }
+    /*
+    Cria um ÚNICO timer para
+    o mosquito atual.
+    */
 
-        if (mosquitoAtual) {
+    mosquitoTimer =
+        setTimeout(
+            function () {
 
-            mosquitoAtual.remove();
+                /*
+                Se o jogo acabou,
+                não faz nada.
+                */
 
-            mosquitoAtual = null;
+                if (!jogoAtivo) {
 
-            perderVida();
+                    return;
+                }
 
-            if (!jogoAtivo) {
-                return;
-            }
-        }
 
-        criarMosquito();
+                /*
+                Se não existe mosquito,
+                não perde vida.
+                */
 
-    }, tempoAtual);
+                if (!mosquitoAtual) {
+
+                    return;
+                }
+
+
+                /*
+                Guarda referência.
+                */
+
+                const mosquitoQueFugiu =
+                    mosquitoAtual;
+
+
+                /*
+                IMPORTANTE:
+
+                Primeiro tira a referência.
+                */
+
+                mosquitoAtual = null;
+
+
+                /*
+                Remove o mosquito.
+                */
+
+                if (
+                    mosquitoQueFugiu.parentNode
+                ) {
+
+                    mosquitoQueFugiu.remove();
+                }
+
+
+                /*
+                Perde uma vida.
+                */
+
+                perderVida();
+
+
+                /*
+                Se ainda estiver jogando,
+                cria outro.
+                */
+
+                if (jogoAtivo) {
+
+                    criarMosquito();
+                }
+
+            },
+            tempoAtual
+        );
 }
 
 
@@ -220,8 +465,14 @@ function criarIntervaloMosquito() {
 function criarMosquito() {
 
     if (!jogoAtivo) {
+
         return;
     }
+
+
+    /*
+    Remove qualquer mosquito anterior.
+    */
 
     if (mosquitoAtual) {
 
@@ -230,14 +481,35 @@ function criarMosquito() {
         mosquitoAtual = null;
     }
 
+
+    /*
+    Cancela qualquer timer antigo.
+    */
+
+    clearTimeout(
+        mosquitoTimer
+    );
+
+    mosquitoTimer = null;
+
+
+    /*
+    Cria imagem.
+    */
+
     const mosquito =
-        document.createElement("img");
+        document.createElement(
+            "img"
+        );
+
 
     mosquito.src =
         "img/mosquito.png";
 
+
     mosquito.className =
         "mosquito";
+
 
     mosquito.id =
         "mosquito";
@@ -249,29 +521,55 @@ function criarMosquito() {
 
     let tamanho = 110;
 
-    if (nivel >= 2) {
+
+    /*
+    Dificuldade gradual:
+
+    Nível 1  = 110px
+    Nível 3  = 105px
+    Nível 5  = 100px
+    Nível 8  = 95px
+    Nível 12 = 90px
+    Nível 16 = 85px
+    Nível 20 = 80px
+    */
+
+
+    if (nivel >= 3) {
+
+        tamanho = 105;
+    }
+
+
+    if (nivel >= 5) {
+
         tamanho = 100;
     }
 
-    if (nivel >= 3) {
+
+    if (nivel >= 8) {
+
+        tamanho = 95;
+    }
+
+
+    if (nivel >= 12) {
+
         tamanho = 90;
     }
 
-    if (nivel >= 4) {
+
+    if (nivel >= 16) {
+
+        tamanho = 85;
+    }
+
+
+    if (nivel >= 20) {
+
         tamanho = 80;
     }
 
-    if (nivel >= 5) {
-        tamanho = 70;
-    }
-
-    if (nivel >= 7) {
-        tamanho = 60;
-    }
-
-    if (nivel >= 10) {
-        tamanho = 50;
-    }
 
     mosquito.style.width =
         tamanho + "px";
@@ -282,44 +580,69 @@ function criarMosquito() {
     ===================================================== */
 
     const margemX = 40;
+
     const margemTopo = 110;
+
     const margemBaixo = 40;
 
+
     const largura =
-        window.innerWidth -
-        tamanho -
-        margemX;
+        Math.max(
+            100,
+            window.innerWidth -
+            tamanho -
+            margemX
+        );
+
 
     const altura =
-        window.innerHeight -
-        tamanho -
-        margemTopo -
-        margemBaixo;
+        Math.max(
+            100,
+            window.innerHeight -
+            tamanho -
+            margemTopo -
+            margemBaixo
+        );
+
 
     const x =
-        Math.max(
-            margemX,
-            Math.random() *
-            Math.max(largura, 100)
-        );
+        margemX +
+        Math.random() *
+        largura;
+
 
     const y =
         margemTopo +
         Math.random() *
-        Math.max(altura, 100);
+        altura;
+
 
     mosquito.style.left =
-        x + "px";
+        Math.min(
+            x,
+            window.innerWidth -
+            tamanho -
+            10
+        ) + "px";
+
 
     mosquito.style.top =
-        y + "px";
+        Math.min(
+            y,
+            window.innerHeight -
+            tamanho -
+            10
+        ) + "px";
 
 
     /* =====================================================
        DIREÇÃO
     ===================================================== */
 
-    if (Math.random() > 0.5) {
+    if (
+        Math.random() >
+        0.5
+    ) {
 
         mosquito.style.transform =
             "scaleX(-1)";
@@ -327,7 +650,7 @@ function criarMosquito() {
 
 
     /* =====================================================
-       MOUSE
+       CLIQUE DO MOUSE
     ===================================================== */
 
     mosquito.addEventListener(
@@ -336,24 +659,61 @@ function criarMosquito() {
 
             evento.stopPropagation();
 
-            if (modoControle === "mouse") {
+
+            if (
+                modoControle ===
+                "mouse"
+            ) {
+
                 capturarMosquito();
             }
+
         }
     );
 
 
+    /* =====================================================
+       ÁREA DO JOGO
+    ===================================================== */
+
     const area =
-        document.getElementById("game-area");
+        document.getElementById(
+            "game-area"
+        );
+
 
     if (!area) {
+
         return;
     }
 
-    area.appendChild(mosquito);
+
+    /*
+    Coloca o mosquito na tela.
+    */
+
+    area.appendChild(
+        mosquito
+    );
+
+
+    /*
+    Define como mosquito atual.
+    */
 
     mosquitoAtual =
         mosquito;
+
+
+    /*
+    =====================================================
+       COMEÇA UM NOVO TIMER
+    =====================================================
+
+    Cada mosquito começa seu próprio contador.
+    */
+
+    criarIntervaloMosquito();
 }
 
 
@@ -364,19 +724,62 @@ function criarMosquito() {
 function capturarMosquito() {
 
     if (!jogoAtivo) {
+
         return;
     }
 
+
     if (!mosquitoAtual) {
+
         return;
     }
+
+
+    /*
+    =====================================================
+    CORREÇÃO DO BUG
+    =====================================================
+
+    Cancela IMEDIATAMENTE o timer do mosquito.
+
+    Assim, depois do clique, esse mosquito não
+    pode mais disparar perderVida().
+    */
+
+    clearTimeout(
+        mosquitoTimer
+    );
+
+    mosquitoTimer = null;
+
+
+    /*
+    Guarda o mosquito capturado.
+    */
 
     const mosquitoCapturado =
         mosquitoAtual;
 
+
+    /*
+    Remove a referência atual.
+    */
+
     mosquitoAtual = null;
 
-    mosquitoCapturado.classList.add("dead");
+
+    /*
+    Animação de morte.
+    */
+
+    mosquitoCapturado.classList.add(
+        "dead"
+    );
+
+
+    /*
+    Soma ponto.
+    */
 
     pontos++;
 
@@ -385,10 +788,14 @@ function capturarMosquito() {
        RECORDE
     ===================================================== */
 
-    if (pontos > recordeLocal) {
+    if (
+        pontos >
+        recordeLocal
+    ) {
 
         recordeLocal =
             pontos;
+
 
         localStorage.setItem(
             "mosquito_recorde",
@@ -397,71 +804,138 @@ function capturarMosquito() {
     }
 
 
+    /*
+    Atualiza nível.
+    */
+
     atualizarNivel();
+
+
+    /*
+    Atualiza HUD.
+    */
 
     atualizarHUD();
 
 
-    setTimeout(function () {
+    /*
+    Remove mosquito morto
+    depois da animação.
+    */
 
-        if (
-            mosquitoCapturado &&
-            mosquitoCapturado.parentNode
-        ) {
+    setTimeout(
+        function () {
 
-            mosquitoCapturado.remove();
-        }
+            if (
+                mosquitoCapturado &&
+                mosquitoCapturado.parentNode
+            ) {
 
-    }, 150);
+                mosquitoCapturado.remove();
+            }
+
+        },
+        150
+    );
 
 
-    setTimeout(function () {
+    /*
+    Cria o próximo mosquito.
 
-        if (jogoAtivo) {
-            criarMosquito();
-        }
+    O novo mosquito vai ganhar
+    um NOVO timer.
+    */
 
-    }, 100);
+    setTimeout(
+        function () {
+
+            if (
+                jogoAtivo &&
+                !mosquitoAtual
+            ) {
+
+                criarMosquito();
+            }
+
+        },
+        120
+    );
 }
 
 
 /* =========================================================
-   NÍVEL / DIFICULDADE
+   ATUALIZAR NÍVEL
 ========================================================= */
 
 function atualizarNivel() {
 
     /*
     A cada 25 pontos sobe um nível.
+
+    0-24   = nível 1
+    25-49  = nível 2
+    50-74  = nível 3
+    75-99  = nível 4
     */
 
     const novoNivel =
-        Math.floor(pontos / 25) + 1;
+        Math.floor(
+            pontos / 25
+        ) + 1;
 
-    if (novoNivel <= nivel) {
+
+    if (
+        novoNivel <= nivel
+    ) {
+
         return;
     }
+
 
     nivel =
         novoNivel;
 
 
-    /* Troca o fundo */
+    /*
+    =====================================================
+    MUDA O FUNDO
+    =====================================================
+
+    A cada 25 pontos.
+    */
 
     mudarFundo();
 
 
-    /* Aumenta dificuldade */
+    /*
+    =====================================================
+    DIFICULDADE
+    =====================================================
+
+    Nível 1 = 1800ms
+    Nível 2 = 1700ms
+    Nível 3 = 1600ms
+    Nível 4 = 1500ms
+    Nível 5 = 1400ms
+    ...
+    Mínimo = 1000ms
+    */
 
     tempoMosquito =
         Math.max(
-            350,
-            1500 -
-            ((nivel - 1) * 180)
+            1000,
+            1800 -
+            (
+                (nivel - 1) *
+                100
+            )
         );
 
 
-    criarIntervaloMosquito();
+    /*
+    O próximo mosquito já usará
+    o novo tempo.
+    */
 
     mostrarNivel();
 }
@@ -473,9 +947,26 @@ function atualizarNivel() {
 
 function mudarFundo() {
 
+    /*
+    Fundo 1:
+    0-24 pontos
+
+    Fundo 2:
+    25-49 pontos
+
+    Fundo 3:
+    50-74 pontos
+
+    Fundo 4:
+    75-99 pontos
+
+    Depois reinicia.
+    */
+
     const indice =
         (nivel - 1) %
         fundos.length;
+
 
     document.body.style.backgroundImage =
         fundos[indice];
@@ -489,25 +980,38 @@ function mudarFundo() {
 function mostrarNivel() {
 
     const aviso =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     aviso.className =
         "level-up-message";
 
+
     aviso.textContent =
-        "NÍVEL " + nivel;
+        "NÍVEL " +
+        nivel;
+
 
     document.body.appendChild(
         aviso
     );
 
-    setTimeout(function () {
 
-        if (aviso.parentNode) {
-            aviso.remove();
-        }
+    setTimeout(
+        function () {
 
-    }, 1500);
+            if (
+                aviso.parentNode
+            ) {
+
+                aviso.remove();
+            }
+
+        },
+        1500
+    );
 }
 
 
@@ -518,14 +1022,20 @@ function mostrarNivel() {
 function perderVida() {
 
     if (!jogoAtivo) {
+
         return;
     }
 
+
     vidas--;
+
 
     atualizarHUD();
 
-    if (vidas <= 0) {
+
+    if (
+        vidas <= 0
+    ) {
 
         finalizarJogo(
             "GAME OVER",
@@ -536,7 +1046,7 @@ function perderVida() {
 
 
 /* =========================================================
-   HUD
+   ATUALIZAR HUD
 ========================================================= */
 
 function atualizarHUD() {
@@ -546,20 +1056,24 @@ function atualizarHUD() {
             "score-display"
         );
 
+
     const highscore =
         document.getElementById(
             "highscore-display"
         );
+
 
     const level =
         document.getElementById(
             "level-display"
         );
 
+
     const lives =
         document.getElementById(
             "lives-display"
         );
+
 
     const time =
         document.getElementById(
@@ -567,29 +1081,58 @@ function atualizarHUD() {
         );
 
 
+    /*
+    Pontos
+    */
+
     if (score) {
+
         score.textContent =
             pontos;
     }
 
+
+    /*
+    Recorde
+    */
+
     if (highscore) {
+
         highscore.textContent =
             recordeLocal;
     }
 
+
+    /*
+    Nível
+    */
+
     if (level) {
+
         level.textContent =
             nivel;
     }
 
+
+    /*
+    Tempo
+    */
+
     if (time) {
+
         time.textContent =
             tempo;
     }
 
+
+    /*
+    Vidas
+    */
+
     if (lives) {
 
         let coracoes = "";
+
 
         for (
             let i = 0;
@@ -597,11 +1140,14 @@ function atualizarHUD() {
             i++
         ) {
 
-            coracoes += "❤️";
+            coracoes +=
+                "❤️";
         }
 
+
         lives.textContent =
-            coracoes || "💔";
+            coracoes ||
+            "💔";
     }
 }
 
@@ -616,22 +1162,35 @@ function finalizarJogo(
 ) {
 
     if (!jogoAtivo) {
+
         return;
     }
 
+
     jogoAtivo = false;
+
+
+    /*
+    Cancela todos os timers.
+    */
+
+    clearTimeout(
+        mosquitoTimer
+    );
+
 
     clearInterval(
         cronometroTimer
     );
 
-    clearInterval(
-        mosquitoTimer
-    );
 
-    cronometroTimer = null;
     mosquitoTimer = null;
+    cronometroTimer = null;
 
+
+    /*
+    Remove mosquito.
+    */
 
     if (mosquitoAtual) {
 
@@ -641,14 +1200,21 @@ function finalizarJogo(
     }
 
 
+    /*
+    Para câmera/mão.
+    */
+
     if (
         typeof pararControleMao ===
         "function"
     ) {
 
         try {
+
             pararControleMao();
+
         } catch (erro) {
+
             console.warn(
                 "Erro ao parar câmera:",
                 erro
@@ -657,39 +1223,59 @@ function finalizarJogo(
     }
 
 
+    /*
+    Esconde câmera e cursor.
+    */
+
     const camera =
         document.getElementById(
             "camera-container"
         );
+
 
     const cursor =
         document.getElementById(
             "hand-cursor"
         );
 
+
     if (camera) {
-        camera.classList.add("hidden");
+
+        camera.classList.add(
+            "hidden"
+        );
     }
+
 
     if (cursor) {
-        cursor.classList.add("hidden");
+
+        cursor.classList.add(
+            "hidden"
+        );
     }
 
+
+    /*
+    Overlay.
+    */
 
     const overlay =
         document.getElementById(
             "game-overlay"
         );
 
+
     const title =
         document.getElementById(
             "overlay-title"
         );
 
+
     const msg =
         document.getElementById(
             "overlay-msg"
         );
+
 
     const finalScore =
         document.getElementById(
@@ -698,30 +1284,43 @@ function finalizarJogo(
 
 
     if (title) {
+
         title.textContent =
             titulo;
     }
 
+
     if (msg) {
+
         msg.textContent =
             mensagem;
     }
 
+
     if (finalScore) {
+
         finalScore.textContent =
             pontos;
     }
 
+
+    /*
+    =====================================================
+    RECORDE
+    =====================================================
+    */
 
     const recordMessage =
         document.getElementById(
             "record-message"
         );
 
+
     if (recordMessage) {
 
         if (
-            pontos === recordeLocal &&
+            pontos ===
+            recordeLocal &&
             pontos > 0
         ) {
 
@@ -738,12 +1337,21 @@ function finalizarJogo(
     }
 
 
+    /*
+    Mostra overlay.
+    */
+
     if (overlay) {
+
         overlay.classList.remove(
             "hidden"
         );
     }
 
+
+    /*
+    Salva ranking.
+    */
 
     if (
         typeof salvarPontuacaoOnline ===
@@ -756,24 +1364,39 @@ function finalizarJogo(
 
 
 /* =========================================================
-   REINICIAR
+   REINICIAR JOGO
 ========================================================= */
 
 function reiniciarJogo() {
 
+    /*
+    Desliga jogo antigo.
+    */
+
     jogoAtivo = false;
+
+
+    /*
+    Cancela timers.
+    */
+
+    clearTimeout(
+        mosquitoTimer
+    );
+
 
     clearInterval(
         cronometroTimer
     );
 
-    clearInterval(
-        mosquitoTimer
-    );
 
-    cronometroTimer = null;
     mosquitoTimer = null;
+    cronometroTimer = null;
 
+
+    /*
+    Remove mosquito.
+    */
 
     if (mosquitoAtual) {
 
@@ -783,14 +1406,21 @@ function reiniciarJogo() {
     }
 
 
+    /*
+    Para câmera.
+    */
+
     if (
         typeof pararControleMao ===
         "function"
     ) {
 
         try {
+
             pararControleMao();
+
         } catch (erro) {
+
             console.warn(
                 "Erro ao reiniciar câmera:",
                 erro
@@ -799,14 +1429,25 @@ function reiniciarJogo() {
     }
 
 
+    /*
+    Esconde overlay.
+    */
+
     esconderOverlay();
 
 
-    setTimeout(function () {
+    /*
+    Reinicia com pequeno intervalo.
+    */
 
-        iniciarJogo();
+    setTimeout(
+        function () {
 
-    }, 300);
+            iniciarJogo();
+
+        },
+        300
+    );
 }
 
 
@@ -820,6 +1461,7 @@ function esconderOverlay() {
         document.getElementById(
             "game-overlay"
         );
+
 
     if (overlay) {
 
@@ -836,19 +1478,34 @@ function esconderOverlay() {
 
 function voltarAoMenu() {
 
+    /*
+    Desliga jogo.
+    */
+
     jogoAtivo = false;
+
+
+    /*
+    Cancela timers.
+    */
+
+    clearTimeout(
+        mosquitoTimer
+    );
+
 
     clearInterval(
         cronometroTimer
     );
 
-    clearInterval(
-        mosquitoTimer
-    );
 
-    cronometroTimer = null;
     mosquitoTimer = null;
+    cronometroTimer = null;
 
+
+    /*
+    Remove mosquito.
+    */
 
     if (mosquitoAtual) {
 
@@ -858,14 +1515,21 @@ function voltarAoMenu() {
     }
 
 
+    /*
+    Para câmera.
+    */
+
     if (
         typeof pararControleMao ===
         "function"
     ) {
 
         try {
+
             pararControleMao();
+
         } catch (erro) {
+
             console.warn(
                 "Erro ao parar câmera:",
                 erro
@@ -874,10 +1538,15 @@ function voltarAoMenu() {
     }
 
 
+    /*
+    Elementos.
+    */
+
     const game =
         document.getElementById(
             "game-screen"
         );
+
 
     const lobby =
         document.getElementById(
@@ -885,21 +1554,48 @@ function voltarAoMenu() {
         );
 
 
+    /*
+    Esconde jogo.
+    */
+
     if (game) {
-        game.classList.add("hidden");
+
+        game.classList.add(
+            "hidden"
+        );
     }
+
+
+    /*
+    Mostra lobby.
+    */
 
     if (lobby) {
-        lobby.classList.remove("hidden");
+
+        lobby.classList.remove(
+            "hidden"
+        );
     }
 
+
+    /*
+    Volta para imagem do lobby.
+    */
 
     document.body.style.backgroundImage =
         'url("img/lobby.png")';
 
 
+    /*
+    Esconde overlay.
+    */
+
     esconderOverlay();
 
+
+    /*
+    Atualiza ranking.
+    */
 
     if (
         typeof carregarRankingOnline ===

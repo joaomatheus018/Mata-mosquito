@@ -29,27 +29,58 @@ function selecionarModo(modo) {
 
     modoControle = modo;
 
+
     const mouse =
-        document.getElementById("mouse-mode");
+        document.getElementById(
+            "mouse-mode"
+        );
 
     const mao =
-        document.getElementById("hand-mode");
+        document.getElementById(
+            "hand-mode"
+        );
 
 
-    mouse.classList.remove("selected");
+    if (mouse) {
 
-    mao.classList.remove("selected");
+        mouse.classList.remove(
+            "selected"
+        );
+
+    }
+
+
+    if (mao) {
+
+        mao.classList.remove(
+            "selected"
+        );
+
+    }
 
 
     if (modo === "mouse") {
 
-        mouse.classList.add("selected");
+        if (mouse) {
+
+            mouse.classList.add(
+                "selected"
+            );
+
+        }
+
 
         pararControleMao();
 
     } else {
 
-        mao.classList.add("selected");
+        if (mao) {
+
+            mao.classList.add(
+                "selected"
+            );
+
+        }
 
     }
 
@@ -65,10 +96,15 @@ JOGAR
 function jogar() {
 
     const nomeInput =
-        document.getElementById("player-name");
+        document.getElementById(
+            "player-name"
+        );
+
 
     let nome =
-        nomeInput.value.trim();
+        nomeInput
+            ? nomeInput.value.trim()
+            : "";
 
 
     if (!nome) {
@@ -81,12 +117,16 @@ function jogar() {
     if (nome.length > 16) {
 
         nome =
-            nome.substring(0, 16);
+            nome.substring(
+                0,
+                16
+            );
 
     }
 
 
-    window.playerName = nome;
+    window.playerName =
+        nome;
 
 
     localStorage.setItem(
@@ -109,8 +149,8 @@ INICIAR CONTROLE DA MÃO
 async function iniciarControleMao() {
 
     /*
-    Se já existir uma câmera,
-    encerra antes de iniciar outra.
+    Evita duas câmeras
+    ao mesmo tempo.
     */
 
     pararControleMao();
@@ -123,6 +163,25 @@ async function iniciarControleMao() {
 
         console.error(
             "MediaPipe não foi carregado."
+        );
+
+
+        atualizarStatusCamera(
+            "❌ MediaPipe não carregou."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
+
+        atualizarStatusCamera(
+            "❌ Seu navegador não permite câmera."
         );
 
         return;
@@ -145,11 +204,6 @@ async function iniciarControleMao() {
             "hand-cursor"
         );
 
-    const status =
-        document.getElementById(
-            "hand-status"
-        );
-
 
     if (!video) {
         return;
@@ -158,14 +212,15 @@ async function iniciarControleMao() {
 
     try {
 
-        status.textContent =
-            "📷 Abrindo câmera...";
+        atualizarStatusCamera(
+            "📷 Abrindo câmera..."
+        );
 
 
         /*
-        =============================================
-        ACESSO À CÂMERA
-        =============================================
+        =================================================
+        CÂMERA
+        =================================================
         */
 
         cameraStream =
@@ -195,9 +250,9 @@ async function iniciarControleMao() {
 
 
         /*
-        =============================================
-        MEDIAPIPE HANDS
-        =============================================
+        =================================================
+        MEDIAPIPE
+        =================================================
         */
 
         handsMao =
@@ -235,9 +290,9 @@ async function iniciarControleMao() {
 
 
         /*
-        =============================================
+        =================================================
         CAMERA MEDIAPIPE
-        =============================================
+        =================================================
         */
 
         cameraMao =
@@ -253,9 +308,20 @@ async function iniciarControleMao() {
                                 jogoAtivo
                             ) {
 
-                                await handsMao.send({
-                                    image: video
-                                });
+                                try {
+
+                                    await handsMao.send({
+                                        image: video
+                                    });
+
+                                } catch (erro) {
+
+                                    console.warn(
+                                        "Erro no processamento da mão:",
+                                        erro
+                                    );
+
+                                }
 
                             }
 
@@ -272,20 +338,31 @@ async function iniciarControleMao() {
         cameraMao.start();
 
 
-        maoIniciada = true;
+        maoIniciada =
+            true;
 
 
-        cameraContainer.classList.remove(
-            "hidden"
+        if (cameraContainer) {
+
+            cameraContainer.classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        if (cursor) {
+
+            cursor.classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        atualizarStatusCamera(
+            "✋ Mostre sua mão"
         );
-
-        cursor.classList.remove(
-            "hidden"
-        );
-
-
-        status.textContent =
-            "✋ Mostre sua mão";
 
 
     } catch (erro) {
@@ -296,11 +373,38 @@ async function iniciarControleMao() {
         );
 
 
-        status.textContent =
-            "❌ Não foi possível acessar a câmera.";
+        atualizarStatusCamera(
+            "❌ Não foi possível acessar a câmera."
+        );
 
 
         pararControleMao();
+
+    }
+
+}
+
+
+/*
+=========================================================
+STATUS DA CÂMERA
+=========================================================
+*/
+
+function atualizarStatusCamera(
+    mensagem
+) {
+
+    const status =
+        document.getElementById(
+            "hand-status"
+        );
+
+
+    if (status) {
+
+        status.textContent =
+            mensagem;
 
     }
 
@@ -313,7 +417,9 @@ PROCESSAR MÃO
 =========================================================
 */
 
-function processarMao(resultados) {
+function processarMao(
+    resultados
+) {
 
     if (!jogoAtivo) {
         return;
@@ -326,18 +432,19 @@ function processarMao(resultados) {
         resultados.multiHandLandmarks.length === 0
     ) {
 
+        atualizarStatusCamera(
+            "✋ Mostre sua mão"
+        );
+
         return;
 
     }
 
 
     const pontos =
-        resultados.multiHandLandmarks[0];
+        resultados
+            .multiHandLandmarks[0];
 
-
-    /*
-    Ponta do dedo indicador
-    */
 
     const indicador =
         pontos[8];
@@ -349,10 +456,9 @@ function processarMao(resultados) {
 
 
     /*
-    =============================================
-    CONVERTER POSIÇÃO DA CÂMERA
-    PARA A TELA
-    =============================================
+    =====================================================
+    POSIÇÃO DO INDICADOR
+    =====================================================
     */
 
     const x =
@@ -383,9 +489,9 @@ function processarMao(resultados) {
 
 
     /*
-    =============================================
-    VERIFICAR MÃO FECHADA
-    =============================================
+    =====================================================
+    DETECTAR MÃO FECHADA
+    =====================================================
     */
 
     const fechada =
@@ -413,8 +519,17 @@ function processarMao(resultados) {
     }
 
 
+    atualizarStatusCamera(
+        fechada
+            ? "✊ PEGAR!"
+            : "☝️ Aponte para o mosquito"
+    );
+
+
     /*
-    Só captura quando fecha a mão.
+    =====================================================
+    CAPTURA
+    =====================================================
     */
 
     if (fechada) {
@@ -422,11 +537,6 @@ function processarMao(resultados) {
         const agora =
             Date.now();
 
-
-        /*
-        Pequeno intervalo para
-        evitar vários cliques seguidos.
-        */
 
         if (
             agora -
@@ -474,7 +584,7 @@ function detectarMaoFechada(
 
 
     /*
-    Indicador
+    INDICADOR
     */
 
     if (
@@ -488,7 +598,7 @@ function detectarMaoFechada(
 
 
     /*
-    Médio
+    MÉDIO
     */
 
     if (
@@ -502,7 +612,7 @@ function detectarMaoFechada(
 
 
     /*
-    Anelar
+    ANELAR
     */
 
     if (
@@ -516,7 +626,7 @@ function detectarMaoFechada(
 
 
     /*
-    Mindinho
+    MINDINHO
     */
 
     if (
@@ -536,7 +646,7 @@ function detectarMaoFechada(
 
 /*
 =========================================================
-COLISÃO DA MÃO COM MOSQUITO
+COLISÃO MÃO + MOSQUITO
 =========================================================
 */
 
@@ -556,21 +666,36 @@ function verificarColisaoComMosquito(
 
 
     const rect =
-        mosquitoAtual.getBoundingClientRect();
+        mosquitoAtual
+            .getBoundingClientRect();
 
 
-    const margem = 35;
+    /*
+    Margem extra para facilitar
+    a captura com a mão.
+    */
+
+    const margem =
+        35;
 
 
     const dentro =
 
-        x >= rect.left - margem &&
+        x >=
+        rect.left -
+        margem &&
 
-        x <= rect.right + margem &&
+        x <=
+        rect.right +
+        margem &&
 
-        y >= rect.top - margem &&
+        y >=
+        rect.top -
+        margem &&
 
-        y <= rect.bottom + margem;
+        y <=
+        rect.bottom +
+        margem;
 
 
     if (dentro) {
@@ -590,13 +715,22 @@ PARAR CONTROLE DA MÃO
 
 function pararControleMao() {
 
-    maoIniciada = false;
+    maoIniciada =
+        false;
 
-    processandoMao = false;
+
+    processandoMao =
+        false;
+
+
+    ultimoCliqueMao =
+        0;
 
 
     /*
-    Para MediaPipe Camera
+    =====================================================
+    MEDIAPIPE CAMERA
+    =====================================================
     */
 
     if (cameraMao) {
@@ -608,7 +742,7 @@ function pararControleMao() {
         } catch (erro) {
 
             console.warn(
-                "Erro ao parar câmera:",
+                "Erro ao parar Camera:",
                 erro
             );
 
@@ -617,11 +751,14 @@ function pararControleMao() {
     }
 
 
-    cameraMao = null;
+    cameraMao =
+        null;
 
 
     /*
-    Fecha MediaPipe Hands
+    =====================================================
+    HANDS
+    =====================================================
     */
 
     if (handsMao) {
@@ -633,7 +770,7 @@ function pararControleMao() {
         } catch (erro) {
 
             console.warn(
-                "Erro ao fechar MediaPipe:",
+                "Erro ao fechar Hands:",
                 erro
             );
 
@@ -642,11 +779,14 @@ function pararControleMao() {
     }
 
 
-    handsMao = null;
+    handsMao =
+        null;
 
 
     /*
-    Para câmera do navegador
+    =====================================================
+    STREAM
+    =====================================================
     */
 
     if (cameraStream) {
@@ -664,8 +804,15 @@ function pararControleMao() {
     }
 
 
-    cameraStream = null;
+    cameraStream =
+        null;
 
+
+    /*
+    =====================================================
+    VÍDEO
+    =====================================================
+    */
 
     const video =
         document.getElementById(
@@ -675,18 +822,28 @@ function pararControleMao() {
 
     if (video) {
 
-        video.pause();
+        try {
 
-        video.srcObject = null;
+            video.pause();
+
+        } catch (erro) {}
+
+        video.srcObject =
+            null;
 
     }
 
+
+    /*
+    =====================================================
+    ELEMENTOS
+    =====================================================
+    */
 
     const camera =
         document.getElementById(
             "camera-container"
         );
-
 
     const cursor =
         document.getElementById(
@@ -720,165 +877,6 @@ function pararControleMao() {
 
 /*
 =========================================================
-REINICIAR JOGO
-=========================================================
-*/
-
-function reiniciarJogo() {
-
-    /*
-    Primeiro encerra completamente
-    o jogo anterior.
-    */
-
-    jogoAtivo = false;
-
-
-    clearInterval(
-        cronometroTimer
-    );
-
-
-    clearInterval(
-        mosquitoTimer
-    );
-
-
-    /*
-    Remove mosquito antigo.
-    */
-
-    if (mosquitoAtual) {
-
-        mosquitoAtual.remove();
-
-        mosquitoAtual = null;
-
-    }
-
-
-    /*
-    MUITO IMPORTANTE:
-    fecha a câmera anterior.
-    */
-
-    pararControleMao();
-
-
-    /*
-    Fecha overlay.
-    */
-
-    esconderOverlay();
-
-
-    /*
-    Pequeno atraso para garantir
-    que a câmera antiga foi liberada.
-    */
-
-    setTimeout(
-        function () {
-
-            iniciarJogo();
-
-        },
-        300
-    );
-
-}
-
-
-/*
-=========================================================
-VOLTAR AO MENU
-=========================================================
-*/
-
-function voltarAoMenu() {
-
-    jogoAtivo = false;
-
-
-    clearInterval(
-        cronometroTimer
-    );
-
-
-    clearInterval(
-        mosquitoTimer
-    );
-
-
-    if (mosquitoAtual) {
-
-        mosquitoAtual.remove();
-
-        mosquitoAtual = null;
-
-    }
-
-
-    pararControleMao();
-
-
-    document
-        .getElementById(
-            "game-screen"
-        )
-        .classList.add(
-            "hidden"
-        );
-
-
-    document
-        .getElementById(
-            "lobby-screen"
-        )
-        .classList.remove(
-            "hidden"
-        );
-
-
-    document.body.style.backgroundImage =
-        'url("img/lobby.png")';
-
-
-    esconderOverlay();
-
-
-    carregarRankingOnline();
-
-}
-
-
-/*
-=========================================================
-ESCONDER OVERLAY
-=========================================================
-*/
-
-function esconderOverlay() {
-
-    const overlay =
-        document.getElementById(
-            "game-overlay"
-        );
-
-
-    if (overlay) {
-
-        overlay.classList.add(
-            "hidden"
-        );
-
-    }
-
-}
-
-
-/*
-=========================================================
 RANKING LOCAL
 =========================================================
 */
@@ -887,92 +885,37 @@ function obterRankingLocal() {
 
     try {
 
-        return JSON.parse(
+        const dados =
             localStorage.getItem(
                 "mosquito_ranking"
-            )
-        ) || [];
+            );
+
+
+        if (!dados) {
+
+            return [];
+
+        }
+
+
+        const ranking =
+            JSON.parse(
+                dados
+            );
+
+
+        return Array.isArray(
+            ranking
+        )
+            ? ranking
+            : [];
+
 
     } catch (erro) {
 
         return [];
 
     }
-
-}
-
-
-/*
-=========================================================
-SALVAR PONTUAÇÃO
-=========================================================
-*/
-
-function salvarPontuacaoOnline() {
-
-    if (pontos <= 0) {
-        return;
-    }
-
-
-    const nome =
-        window.playerName ||
-        "Player";
-
-
-    let ranking =
-        obterRankingLocal();
-
-
-    ranking.push({
-
-        nome: nome,
-
-        score: pontos,
-
-        nivel: nivel,
-
-        modo: modoControle,
-
-        data: Date.now()
-
-    });
-
-
-    /*
-    Ordena do maior para o menor.
-    */
-
-    ranking.sort(
-        function (a, b) {
-
-            return b.score -
-                a.score;
-
-        }
-    );
-
-
-    /*
-    Guarda somente os 10 melhores.
-    */
-
-    ranking =
-        ranking.slice(
-            0,
-            10
-        );
-
-
-    localStorage.setItem(
-        "mosquito_ranking",
-        JSON.stringify(
-            ranking
-        )
-    );
-
-
-    carregarRankingOnline();
 
 }
 
@@ -1017,54 +960,57 @@ function carregarRankingOnline() {
     }
 
 
-    lista.innerHTML = "";
+    lista.innerHTML =
+        "";
 
 
-    jogadores.forEach(
-        function (
-            jogador,
-            index
-        ) {
+    jogadores
+        .slice(0, 10)
+        .forEach(
+            function (
+                jogador,
+                index
+            ) {
 
-            const row =
-                document.createElement(
-                    "div"
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                row.className =
+                    "ranking-row";
+
+
+                row.innerHTML = `
+
+                    <div class="ranking-position">
+                        ${index + 1}
+                    </div>
+
+                    <div class="ranking-name">
+                        ${escaparHTML(
+                            jogador.nome ||
+                            "Player"
+                        )}
+                    </div>
+
+                    <div class="ranking-score">
+                        ${Number(
+                            jogador.score ||
+                            0
+                        )} pts
+                    </div>
+
+                `;
+
+
+                lista.appendChild(
+                    row
                 );
 
-
-            row.className =
-                "ranking-row";
-
-
-            row.innerHTML = `
-
-                <div class="ranking-position">
-                    ${index + 1}
-                </div>
-
-                <div class="ranking-name">
-                    ${escaparHTML(
-                        jogador.nome ||
-                        "Player"
-                    )}
-                </div>
-
-                <div class="ranking-score">
-                    ${Number(
-                        jogador.score ||
-                        0
-                    )} pts
-                </div>
-
-            `;
-
-
-            lista.appendChild(
-                row
-            );
-
-        }
-    );
+            }
+        );
 
 }
 
@@ -1075,7 +1021,9 @@ SEGURANÇA
 =========================================================
 */
 
-function escaparHTML(texto) {
+function escaparHTML(
+    texto
+) {
 
     const div =
         document.createElement(

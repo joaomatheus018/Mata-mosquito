@@ -1,6 +1,8 @@
-/* =========================================================
-   CONFIGURAÇÃO DO FIREBASE
-========================================================= */
+/*
+=========================================================
+FIREBASE
+=========================================================
+*/
 
 const firebaseConfig = {
 
@@ -24,92 +26,49 @@ const firebaseConfig = {
 
     appId:
         "SEU_APP_ID"
+
 };
 
 
-/* =========================================================
-   INICIALIZAÇÃO DO FIREBASE
-========================================================= */
+/*
+=========================================================
+INICIALIZAÇÃO
+=========================================================
+*/
 
-let firebaseOnline = false;
-
-window.firebaseDB = null;
-
-
-const firebaseNaoConfigurado =
-    !firebaseConfig.apiKey ||
-    firebaseConfig.apiKey ===
-        "COLE_SUA_API_KEY_AQUI" ||
-
-    firebaseConfig.authDomain.includes(
-        "SEU-PROJETO"
-    ) ||
-
-    firebaseConfig.databaseURL.includes(
-        "SEU-PROJETO"
-    ) ||
-
-    firebaseConfig.projectId ===
-        "SEU-PROJETO" ||
-
-    firebaseConfig.messagingSenderId ===
-        "SEU_MESSAGING_SENDER_ID" ||
-
-    firebaseConfig.appId ===
-        "SEU_APP_ID";
+window.firebaseDB =
+    null;
 
 
-if (
-    !firebaseNaoConfigurado &&
-    typeof firebase !== "undefined"
-) {
+try {
 
-    try {
+    if (
+        typeof firebase !==
+        "undefined"
+    ) {
 
-        if (
-            !firebase.apps ||
-            firebase.apps.length === 0
-        ) {
-
-            firebase.initializeApp(
-                firebaseConfig
-            );
-        }
+        firebase.initializeApp(
+            firebaseConfig
+        );
 
 
         window.firebaseDB =
             firebase.database();
 
 
-        firebaseOnline = true;
-
-
         console.log(
-            "Firebase conectado com sucesso."
+            "Firebase conectado."
         );
 
-
-    } catch (erro) {
-
-        firebaseOnline = false;
-
-        window.firebaseDB = null;
-
-
-        console.warn(
-            "Não foi possível conectar ao Firebase.",
-            erro
-        );
     }
 
-} else {
+} catch (erro) {
 
-    firebaseOnline = false;
-
-    window.firebaseDB = null;
-
-
-    console.log(
-        "Firebase ainda não configurado."
+    console.warn(
+        "Firebase ainda não configurado. O ranking local continuará funcionando."
     );
+
+    window.firebaseDB =
+        null;
+
 }

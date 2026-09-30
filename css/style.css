@@ -1,13 +1,8 @@
-/* =====================================================
-   CONFIGURAÇÃO GERAL
-===================================================== */
-
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
-
 
 html,
 body {
@@ -15,139 +10,142 @@ body {
     height: 100%;
 }
 
-
 body {
-    min-height: 100vh;
+    font-family: 'Orbitron', sans-serif;
 
-    overflow: hidden;
-
-    font-family: "Orbitron", sans-serif;
-
-    background:
-        url("../img/lobby.png")
-        center / cover
-        no-repeat fixed;
+    background-image: url("../img/lobby.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 
     color: white;
 
-    transition:
-        background-image 0.5s ease;
-}
+    overflow: hidden;
 
+    transition:
+        background-image 0.8s ease,
+        background-color 0.5s ease;
+}
 
 button,
 input {
-    font-family: inherit;
+    font-family: 'Orbitron', sans-serif;
 }
-
 
 button {
     cursor: pointer;
 }
-
 
 .hidden {
     display: none !important;
 }
 
 
-/* =====================================================
-   LOBBY
-===================================================== */
+/* ================================================= */
+/* LOBBY */
+/* ================================================= */
 
 #lobby-screen {
     width: 100%;
-    min-height: 100vh;
+    height: 100vh;
 
     display: flex;
 
-    align-items: center;
-
     justify-content: center;
+    align-items: center;
 
     padding: 20px;
 
-    overflow-y: auto;
-
     background:
-        linear-gradient(
-            rgba(2, 7, 20, 0.45),
-            rgba(2, 7, 20, 0.75)
+        radial-gradient(
+            circle at center,
+            rgba(0, 255, 200, 0.08),
+            rgba(0, 0, 0, 0.55)
         );
 }
 
 
 .lobby-card {
     width: 430px;
+    max-width: 95vw;
 
-    max-width: 100%;
+    max-height: 95vh;
+
+    overflow-y: auto;
 
     padding: 28px;
 
-    border-radius: 22px;
-
     background:
-        rgba(5, 10, 27, 0.94);
+        rgba(8, 15, 35, 0.94);
 
     border:
-        1px solid rgba(40, 231, 189, 0.45);
+        1px solid rgba(0, 255, 200, 0.5);
+
+    border-radius: 24px;
 
     box-shadow:
-        0 0 40px rgba(0, 0, 0, 0.5),
-        0 0 30px rgba(40, 231, 189, 0.08);
+        0 0 30px rgba(0, 255, 200, 0.15),
+        inset 0 0 30px rgba(0, 0, 0, 0.4);
 
     text-align: center;
 
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(8px);
 }
 
 
-/* =====================================================
-   LOGO
-===================================================== */
-
 .hand-icon {
-    font-size: 38px;
+    width: 70px;
+    height: 70px;
 
-    margin-bottom: 8px;
+    margin: 0 auto 18px;
 
-    filter:
-        drop-shadow(
-            0 0 10px
-            rgba(40, 231, 189, 0.5)
-        );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 18px;
+
+    background:
+        rgba(0, 220, 180, 0.08);
+
+    border:
+        1px solid rgba(0, 255, 200, 0.4);
+
+    font-size: 36px;
+
+    box-shadow:
+        0 0 20px rgba(0, 255, 200, 0.15);
 }
 
 
 .lobby-card h1 {
     color: #28e7bd;
 
-    font-size: 30px;
+    font-size: 32px;
 
     font-weight: 900;
 
-    letter-spacing: 2px;
-
-    margin-bottom: 6px;
+    letter-spacing: 1px;
 
     text-shadow:
-        0 0 15px
-        rgba(40, 231, 189, 0.3);
+        0 0 12px rgba(40, 231, 189, 0.5);
 }
 
 
 .subtitle {
-    color: #78839c;
+    margin-top: 7px;
 
-    font-size: 10px;
+    margin-bottom: 22px;
 
-    margin-bottom: 23px;
+    color: #8791aa;
+
+    font-size: 12px;
 }
 
 
-/* =====================================================
-   INPUT
-===================================================== */
+/* ================================================= */
+/* INPUT */
+/* ================================================= */
 
 .input-group {
     text-align: left;
@@ -159,75 +157,73 @@ button {
 .input-group label {
     display: block;
 
-    margin-bottom: 7px;
+    margin-bottom: 8px;
 
     color: #c8cedd;
 
-    font-size: 10px;
+    font-size: 12px;
 
     font-weight: 700;
 }
 
 
-.input-group input {
+#player-name {
     width: 100%;
 
-    padding: 13px;
+    padding: 14px 16px;
 
-    border-radius: 10px;
+    border-radius: 12px;
 
     border:
         1px solid #29334e;
 
-    outline: none;
-
     background:
-        #080e20;
+        #050a1b;
 
     color: white;
 
-    font-size: 11px;
+    outline: none;
+
+    font-size: 14px;
 
     transition: 0.2s;
 }
 
 
-.input-group input::placeholder {
-    color: #59647a;
-}
-
-
-.input-group input:focus {
+#player-name:focus {
     border-color: #28e7bd;
 
     box-shadow:
-        0 0 12px
-        rgba(40, 231, 189, 0.15);
+        0 0 15px rgba(40, 231, 189, 0.15);
 }
 
 
-/* =====================================================
-   MODO
-===================================================== */
+#player-name::placeholder {
+    color: #53617d;
+}
+
+
+/* ================================================= */
+/* MODOS */
+/* ================================================= */
 
 .mode-title {
     text-align: left;
 
-    margin-bottom: 9px;
-
     color: #c8cedd;
 
-    font-size: 10px;
+    font-size: 12px;
 
     font-weight: 700;
+
+    margin-bottom: 9px;
 }
 
 
 .mode-selection {
     display: grid;
 
-    grid-template-columns:
-        1fr 1fr;
+    grid-template-columns: 1fr 1fr;
 
     gap: 10px;
 
@@ -240,10 +236,10 @@ button {
 
     padding: 15px;
 
+    border-radius: 14px;
+
     border:
         1px solid #29334e;
-
-    border-radius: 14px;
 
     background:
         #0a1023;
@@ -282,8 +278,7 @@ button {
         );
 
     box-shadow:
-        0 0 18px
-        rgba(40, 231, 189, 0.12);
+        0 0 18px rgba(40, 231, 189, 0.12);
 }
 
 
@@ -293,11 +288,11 @@ button {
 
 
 .mode-name {
-    color: #28e7bd;
-
     font-size: 13px;
 
     font-weight: 900;
+
+    color: #28e7bd;
 }
 
 
@@ -310,9 +305,9 @@ button {
 }
 
 
-/* =====================================================
-   BOTÃO JOGAR
-===================================================== */
+/* ================================================= */
+/* BOTÃO JOGAR */
+/* ================================================= */
 
 #btn-jogar {
     width: 100%;
@@ -332,13 +327,12 @@ button {
 
     color: #001914;
 
-    font-size: 14px;
-
     font-weight: 900;
 
+    font-size: 14px;
+
     box-shadow:
-        0 0 20px
-        rgba(0, 200, 150, 0.25);
+        0 0 20px rgba(0, 200, 150, 0.25);
 
     transition: 0.2s;
 }
@@ -348,32 +342,26 @@ button {
     transform: translateY(-2px);
 
     box-shadow:
-        0 0 28px
-        rgba(0, 255, 200, 0.35);
+        0 0 28px rgba(0, 255, 200, 0.35);
 }
 
 
-#btn-jogar:active {
-    transform: scale(0.98);
-}
-
-
-/* =====================================================
-   RANKING
-===================================================== */
+/* ================================================= */
+/* RANKING */
+/* ================================================= */
 
 .ranking {
     margin-top: 20px;
 
     padding: 14px;
 
+    background:
+        #050a1b;
+
     border:
         1px solid #202b45;
 
     border-radius: 15px;
-
-    background:
-        #050a1b;
 
     text-align: left;
 }
@@ -404,8 +392,7 @@ button {
 
     border-radius: 20px;
 
-    background:
-        #111b33;
+    background: #111b33;
 
     color: #8390aa;
 
@@ -454,8 +441,7 @@ button {
 
     border-radius: 5px;
 
-    background:
-        #18233a;
+    background: #18233a;
 
     color: #9aa5ba;
 
@@ -466,13 +452,13 @@ button {
 
 
 .ranking-name {
-    overflow: hidden;
-
     color: #cbd2df;
 
     font-size: 10px;
 
     font-weight: 700;
+
+    overflow: hidden;
 
     text-overflow: ellipsis;
 
@@ -500,18 +486,20 @@ button {
 }
 
 
-/* =====================================================
-   ÁREA DO JOGO
-===================================================== */
+/* ================================================= */
+/* JOGO */
+/* ================================================= */
 
 #game-screen {
     position: relative;
 
     width: 100%;
-
     height: 100vh;
 
     overflow: hidden;
+
+    background:
+        rgba(0, 0, 0, 0.05);
 }
 
 
@@ -542,9 +530,9 @@ button {
 }
 
 
-/* =====================================================
-   HUD
-===================================================== */
+/* ================================================= */
+/* HUD */
+/* ================================================= */
 
 #hud {
     position: fixed;
@@ -553,40 +541,35 @@ button {
 
     left: 50%;
 
-    transform:
-        translateX(-50%);
-
-    z-index: 500;
-
-    width: 95%;
+    transform: translateX(-50%);
 
     display: flex;
 
-    flex-wrap: wrap;
+    gap: 8px;
 
-    align-items: center;
+    flex-wrap: wrap;
 
     justify-content: center;
 
-    gap: 8px;
+    width: 95%;
+
+    z-index: 500;
 }
 
 
 .hud-item {
     padding: 9px 13px;
 
-    border:
-        1px solid
-        rgba(0, 220, 190, 0.4);
-
     border-radius: 9px;
 
     background:
         rgba(5, 10, 27, 0.88);
 
+    border:
+        1px solid rgba(0, 220, 190, 0.4);
+
     box-shadow:
-        0 0 12px
-        rgba(0, 220, 190, 0.1);
+        0 0 12px rgba(0, 220, 190, 0.1);
 
     color: #cbd2df;
 
@@ -618,24 +601,20 @@ button {
 }
 
 
-/* =====================================================
-   MOSQUITO
-===================================================== */
+/* ================================================= */
+/* MOSQUITO */
+/* ================================================= */
 
 .mosquito {
     position: fixed;
 
     z-index: 300;
 
-    display: block;
-
     user-select: none;
 
     -webkit-user-drag: none;
 
     pointer-events: auto;
-
-    touch-action: none;
 
     cursor: crosshair;
 
@@ -645,8 +624,7 @@ button {
 
     filter:
         drop-shadow(
-            0 0 8px
-            rgba(0, 255, 220, 0.5)
+            0 0 8px rgba(0, 255, 220, 0.5)
         );
 }
 
@@ -654,8 +632,7 @@ button {
 .mosquito:hover {
     filter:
         drop-shadow(
-            0 0 15px
-            rgba(0, 255, 220, 0.9)
+            0 0 14px rgba(0, 255, 220, 0.9)
         );
 }
 
@@ -663,7 +640,8 @@ button {
 .mosquito.dead {
     animation:
         mosquitoDeath
-        0.15s ease
+        0.15s
+        ease
         forwards;
 }
 
@@ -671,133 +649,55 @@ button {
 @keyframes mosquitoDeath {
 
     from {
+        transform: scale(1);
         opacity: 1;
-
-        transform:
-            scale(1);
     }
 
     to {
-        opacity: 0;
-
         transform:
             scale(1.6)
             rotate(20deg);
-    }
-}
 
-
-/* =====================================================
-   AVISO DE NÍVEL
-===================================================== */
-
-.level-up-message {
-    position: fixed;
-
-    top: 50%;
-
-    left: 50%;
-
-    z-index: 1500;
-
-    transform:
-        translate(-50%, -50%);
-
-    padding: 20px 35px;
-
-    border:
-        2px solid #28e7bd;
-
-    border-radius: 15px;
-
-    background:
-        rgba(5, 10, 27, 0.95);
-
-    color: #28e7bd;
-
-    font-size: 25px;
-
-    font-weight: 900;
-
-    box-shadow:
-        0 0 30px
-        rgba(40, 231, 189, 0.4);
-
-    animation:
-        levelMessage
-        1.5s ease
-        forwards;
-}
-
-
-@keyframes levelMessage {
-
-    0% {
         opacity: 0;
-
-        transform:
-            translate(-50%, -50%)
-            scale(0.7);
     }
 
-    20% {
-        opacity: 1;
-
-        transform:
-            translate(-50%, -50%)
-            scale(1);
-    }
-
-    80% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-
-        transform:
-            translate(-50%, -50%)
-            scale(1.1);
-    }
 }
 
 
-/* =====================================================
-   CÂMERA
-===================================================== */
+/* ================================================= */
+/* CÂMERA */
+/* ================================================= */
 
 #camera-container {
     position: fixed;
 
-    right: 15px;
-
     bottom: 15px;
 
-    z-index: 600;
+    right: 15px;
 
     width: 190px;
 
     height: 140px;
 
+    border-radius: 14px;
+
     overflow: hidden;
+
+    z-index: 600;
 
     border:
         2px solid #28e7bd;
-
-    border-radius: 14px;
 
     background:
         #050a1b;
 
     box-shadow:
-        0 0 20px
-        rgba(0, 255, 200, 0.2);
+        0 0 20px rgba(0, 255, 200, 0.2);
 }
 
 
 #camera-video {
     width: 100%;
-
     height: 100%;
 
     object-fit: cover;
@@ -810,37 +710,45 @@ button {
 #hand-status {
     position: absolute;
 
-    right: 0;
     bottom: 0;
+
     left: 0;
+
+    right: 0;
 
     padding: 7px;
 
     background:
         rgba(0, 0, 0, 0.75);
 
+    text-align: center;
+
     color: white;
 
     font-size: 8px;
 
     font-weight: 700;
-
-    text-align: center;
 }
 
 
-/* =====================================================
-   CURSOR DA MÃO
-===================================================== */
+/* ================================================= */
+/* CURSOR DA MÃO */
+/* ================================================= */
 
 #hand-cursor {
     position: fixed;
 
+    width: 58px;
+    height: 58px;
+
+    border-radius: 50%;
+
     z-index: 1000;
 
-    width: 58px;
+    pointer-events: none;
 
-    height: 58px;
+    transform:
+        translate(-50%, -50%);
 
     display: flex;
 
@@ -848,22 +756,14 @@ button {
 
     justify-content: center;
 
-    border:
-        2px solid #28e7bd;
-
-    border-radius: 50%;
-
     background:
         rgba(40, 231, 189, 0.15);
 
+    border:
+        2px solid #28e7bd;
+
     box-shadow:
-        0 0 20px
-        rgba(40, 231, 189, 0.5);
-
-    pointer-events: none;
-
-    transform:
-        translate(-50%, -50%);
+        0 0 20px rgba(40, 231, 189, 0.5);
 }
 
 
@@ -873,27 +773,28 @@ button {
 
 
 #hand-cursor.closed {
-    border-color: #ff48d7;
 
     background:
         rgba(255, 70, 215, 0.25);
 
+    border-color:
+        #ff48d7;
+
     box-shadow:
-        0 0 25px
-        rgba(255, 70, 215, 0.7);
+        0 0 25px rgba(255, 70, 215, 0.7);
 }
 
 
-/* =====================================================
-   BOTÃO SAIR
-===================================================== */
+/* ================================================= */
+/* BOTÃO MENU */
+/* ================================================= */
 
 #btn-sair {
     position: fixed;
 
-    top: 15px;
-
     right: 15px;
+
+    top: 15px;
 
     z-index: 700;
 
@@ -912,21 +813,12 @@ button {
     font-size: 9px;
 
     font-weight: 700;
-
-    cursor: pointer;
 }
 
 
-#btn-sair:hover {
-    border-color: #28e7bd;
-
-    color: #28e7bd;
-}
-
-
-/* =====================================================
-   OVERLAY GAME OVER
-===================================================== */
+/* ================================================= */
+/* OVERLAY */
+/* ================================================= */
 
 .overlay {
     position: fixed;
@@ -946,8 +838,7 @@ button {
     background:
         rgba(0, 0, 0, 0.72);
 
-    backdrop-filter:
-        blur(6px);
+    backdrop-filter: blur(6px);
 }
 
 
@@ -958,44 +849,43 @@ button {
 
     padding: 30px;
 
-    border:
-        1px solid #28e7bd;
-
     border-radius: 20px;
+
+    text-align: center;
 
     background:
         #080f23;
 
-    box-shadow:
-        0 0 40px
-        rgba(0, 255, 200, 0.15);
+    border:
+        1px solid #28e7bd;
 
-    text-align: center;
+    box-shadow:
+        0 0 40px rgba(0, 255, 200, 0.15);
 }
 
 
 .overlay-icon {
-    margin-bottom: 10px;
-
     font-size: 42px;
+
+    margin-bottom: 10px;
 }
 
 
 .overlay-card h2 {
-    margin-bottom: 10px;
-
     color: #28e7bd;
 
     font-size: 25px;
+
+    margin-bottom: 10px;
 }
 
 
 .overlay-card p {
-    margin-bottom: 22px;
-
     color: #8b96ad;
 
     font-size: 11px;
+
+    margin-bottom: 22px;
 }
 
 
@@ -1044,14 +934,13 @@ button {
 @keyframes recordPulse {
 
     from {
-        transform:
-            scale(1);
+        transform: scale(1);
     }
 
     to {
-        transform:
-            scale(1.08);
+        transform: scale(1.08);
     }
+
 }
 
 
@@ -1078,79 +967,130 @@ button {
     font-size: 10px;
 
     font-weight: 900;
-
-    cursor: pointer;
-}
-
-
-.overlay-card button:hover {
-    filter:
-        brightness(1.1);
 }
 
 
 .overlay-card .secondary-button {
-    border:
-        1px solid #293550;
 
     background:
         #141d34;
 
     color: #aab3c5;
+
+    border:
+        1px solid #293550;
 }
 
 
-/* =====================================================
-   RESPONSIVO
-===================================================== */
+/* ================================================= */
+/* AVISO DE NÍVEL */
+/* ================================================= */
 
-@media (max-width: 600px) {
+.level-up-message {
 
-    #lobby-screen {
-        align-items: flex-start;
+    position: fixed;
 
-        padding-top: 20px;
+    top: 50%;
+
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    z-index: 1500;
+
+    padding: 18px 30px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(5, 10, 27, 0.95);
+
+    border:
+        2px solid #28e7bd;
+
+    color: #28e7bd;
+
+    font-size: 28px;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    box-shadow:
+        0 0 30px
+        rgba(40, 231, 189, 0.5);
+
+    animation:
+        levelMessage
+        1.5s
+        ease
+        forwards;
+
+    pointer-events: none;
+}
+
+
+@keyframes levelMessage {
+
+    0% {
+        opacity: 0;
+        transform:
+            translate(-50%, -50%)
+            scale(0.5);
     }
 
+    20% {
+        opacity: 1;
+        transform:
+            translate(-50%, -50%)
+            scale(1);
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            translate(-50%, -50%)
+            scale(1.15);
+    }
+
+}
+
+
+/* ================================================= */
+/* RESPONSIVO */
+/* ================================================= */
+
+@media (max-width: 600px) {
 
     .lobby-card {
         padding: 20px;
     }
 
-
     .lobby-card h1 {
         font-size: 25px;
     }
-
 
     .mode-selection {
         grid-template-columns: 1fr;
     }
 
-
     #camera-container {
         width: 140px;
-
         height: 105px;
     }
 
-
-    #hand-cursor {
-        width: 50px;
-
-        height: 50px;
-    }
-
-
     .hud-item {
         padding: 7px 9px;
-
         font-size: 8px;
     }
 
-
-    .overlay-card {
-        padding: 22px;
+    .level-up-message {
+        font-size: 20px;
     }
 
 }

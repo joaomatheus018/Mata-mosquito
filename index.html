@@ -18,9 +18,9 @@
 
 <body>
 
-    <!-- ========================= -->
+    <!-- ================================================= -->
     <!-- LOBBY -->
-    <!-- ========================= -->
+    <!-- ================================================= -->
 
     <main id="lobby-screen">
 
@@ -36,6 +36,8 @@
                 Escolha como você quer jogar
             </p>
 
+            <!-- NOME -->
+
             <div class="input-group">
 
                 <label for="player-name">
@@ -50,6 +52,8 @@
                     autocomplete="off">
 
             </div>
+
+            <!-- MODO -->
 
             <div class="mode-title">
                 MODO DE CONTROLE
@@ -77,6 +81,7 @@
 
                 </button>
 
+
                 <button
                     id="hand-mode"
                     class="mode-card"
@@ -99,6 +104,8 @@
 
             </div>
 
+            <!-- JOGAR -->
+
             <button
                 id="btn-jogar"
                 type="button"
@@ -109,12 +116,16 @@
 
             </button>
 
+
+            <!-- RANKING -->
+
             <section class="ranking">
 
                 <div class="ranking-header">
 
                     <div>
-                        🏆 TOP CAÇADORES
+                        🏆
+                        TOP CAÇADORES
                     </div>
 
                     <span>
@@ -138,53 +149,72 @@
     </main>
 
 
-    <!-- ========================= -->
+    <!-- ================================================= -->
     <!-- JOGO -->
-    <!-- ========================= -->
+    <!-- ================================================= -->
 
     <main
         id="game-screen"
         class="hidden">
 
+        <!-- HUD -->
+
         <div id="hud">
 
             <div class="hud-item">
+
                 ❤️
+
                 <span id="lives-display">
                     ❤️❤️❤️
                 </span>
+
             </div>
 
             <div class="hud-item">
+
                 PONTOS:
+
                 <strong id="score-display">
                     0
                 </strong>
+
             </div>
 
             <div class="hud-item">
+
                 RECORDE:
+
                 <strong id="highscore-display">
                     0
                 </strong>
+
             </div>
 
             <div class="hud-item">
+
                 NÍVEL:
+
                 <strong id="level-display">
                     1
                 </strong>
+
             </div>
 
             <div class="hud-item">
+
                 TEMPO:
+
                 <strong id="time-display">
                     60
                 </strong>
+
             </div>
 
         </div>
 
+
+        <!-- ÁREA DO JOGO -->
 
         <div id="game-area"></div>
 
@@ -282,20 +312,23 @@
         </div>
 
 
+        <!-- MENU -->
+
         <button
             id="btn-sair"
             onclick="voltarAoMenu()">
 
-            ✕ MENU
+            ✕
+            MENU
 
         </button>
 
     </main>
 
 
-    <!-- ========================= -->
+    <!-- ================================================= -->
     <!-- MEDIAPIPE -->
-    <!-- ========================= -->
+    <!-- ================================================= -->
 
     <script
         src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
@@ -318,9 +351,9 @@
     </script>
 
 
-    <!-- ========================= -->
+    <!-- ================================================= -->
     <!-- FIREBASE -->
-    <!-- ========================= -->
+    <!-- ================================================= -->
 
     <script
         src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js">
@@ -331,12 +364,14 @@
     </script>
 
 
-    <!-- ========================= -->
-    <!-- SEUS JS -->
-    <!-- ========================= -->
+    <!-- ================================================= -->
+    <!-- ARQUIVOS DO JOGO -->
+    <!-- ================================================= -->
 
     <script src="js/config.js"></script>
+
     <script src="js/game.js"></script>
+
     <script src="js/script.js"></script>
 
 </body>
