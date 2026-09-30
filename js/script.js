@@ -1,19 +1,120 @@
-function jogar() {
-    const lobby = document.getElementById("lobby-screen");
-    const game = document.getElementById("game-screen");
+/*
+=========================================================
+CONFIGURAÇÃO DO LOBBY
+=========================================================
+*/
 
-    if (lobby) {
-        lobby.classList.add("hidden");
+let modoControle = "mouse";
+
+
+/*
+=========================================================
+ESCOLHER MODO
+=========================================================
+*/
+
+function selecionarModo(modo) {
+
+    modoControle = modo;
+
+    const mouse =
+        document.getElementById("mouse-mode");
+
+    const mao =
+        document.getElementById("hand-mode");
+
+
+    mouse.classList.remove("selected");
+
+    mao.classList.remove("selected");
+
+
+    if (modo === "mouse") {
+
+        mouse.classList.add("selected");
+
+    } else {
+
+        mao.classList.add("selected");
+
     }
 
-    if (game) {
-        game.classList.remove("hidden");
-    }
-
-    // Inicia o jogo
-    if (typeof iniciarJogo === "function") {
-        iniciarJogo();
-    } else if (typeof reiniciarIntervaloMosquito === "function") {
-        reiniciarIntervaloMosquito();
-    }
 }
+
+
+/*
+=========================================================
+JOGAR
+=========================================================
+*/
+
+function jogar() {
+
+    const nomeInput =
+        document.getElementById("player-name");
+
+    let nome =
+        nomeInput.value.trim();
+
+
+    if (!nome) {
+
+        nome = "Player";
+
+    }
+
+
+    if (nome.length > 16) {
+
+        nome = nome.substring(0, 16);
+
+    }
+
+
+    window.playerName = nome;
+
+
+    localStorage.setItem(
+        "mosquito_nome",
+        nome
+    );
+
+
+    iniciarJogo();
+
+}
+
+
+/*
+=========================================================
+CARREGAR NOME SALVO
+=========================================================
+*/
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const nomeSalvo =
+            localStorage.getItem(
+                "mosquito_nome"
+            );
+
+        const input =
+            document.getElementById(
+                "player-name"
+            );
+
+
+        if (nomeSalvo && input) {
+
+            input.value =
+                nomeSalvo;
+
+        }
+
+
+        carregarRankingOnline();
+
+    }
+);

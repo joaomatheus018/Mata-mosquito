@@ -3,106 +3,298 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Mata Mosquito</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
 
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-    <div id="custom-cursor"></div>
+    <!-- ================================================= -->
+    <!-- LOBBY -->
+    <!-- ================================================= -->
 
-    <div class="container">
+    <main id="lobby-screen">
 
-        <header>
+        <section class="lobby-card">
 
-            <div id="logo">
-                Mata Mosquito
-
-                <figure>
-                    <img class="img-logo" src="img/Mosquito.png" alt="logo">
-                </figure>
+            <div class="hand-icon">
+                ✋
             </div>
 
-            <nav>
-                <ul>
-                    <li class="active">
-                        <a class="nav-link" href="index.html">Início</a>
-                    </li>
-                </ul>
-            </nav>
+            <h1>MATA MOSQUITO</h1>
 
-        </header>
+            <p class="subtitle">
+                Escolha como você quer jogar
+            </p>
 
+            <!-- NOME -->
 
-        <!-- LOBBY -->
+            <div class="input-group">
 
-        <main id="lobby-screen">
+                <label for="player-name">
+                    SEU APELIDO
+                </label>
 
-            <div class="logo-spacer"></div>
-
-            <a class="bounce2" id="btn-jogar" onclick="jogar()">
-                JOGAR AGORA
-            </a>
-
-        </main>
-
-
-        <!-- JOGO -->
-
-        <div id="game-screen" class="hidden">
-
-            <div id="hud">
-
-                <div class="hud-item">
-                    VIDA:
-                    <span id="lives-display">❤️❤️❤️</span>
-                </div>
-
-                <div class="hud-item">
-                    PONTOS:
-                    <span id="score-display">0</span>
-                </div>
-
-                <div class="hud-item">
-                    RECORDE:
-                    <span id="highscore-display">0</span>
-                </div>
-
-                <div class="hud-item">
-                    NÍVEL:
-                    <span id="level-display">1</span>
-                </div>
-
-                <div class="hud-item">
-                    TEMPO:
-                    <span id="time-display">60</span>
-                </div>
+                <input
+                    type="text"
+                    id="player-name"
+                    maxlength="16"
+                    placeholder="Ex: Player1"
+                    autocomplete="off">
 
             </div>
 
+            <!-- MODO DE JOGO -->
 
-            <canvas id="gameCanvas" width="800" height="500"></canvas>
+            <div class="mode-title">
+                MODO DE CONTROLE
+            </div>
 
+            <div class="mode-selection">
 
-            <div id="game-overlay" class="overlay hidden">
+                <button
+                    id="mouse-mode"
+                    class="mode-card selected"
+                    type="button"
+                    onclick="selecionarModo('mouse')">
 
-                <h2 id="overlay-title">GAME OVER</h2>
+                    <span class="mode-icon">
+                        🖱️
+                    </span>
 
-                <p id="overlay-msg">
-                    Sua bola caiu!
-                </p>
+                    <span class="mode-name">
+                        MOUSE
+                    </span>
 
-                <button id="btn-restart" onclick="reiniciarJogo()">
-                    TENTAR NOVAMENTE
+                    <span class="mode-description">
+                        Clique no mosquito
+                    </span>
+
                 </button>
 
-                <button id="btn-menu" onclick="voltarAoMenu()">
-                    VOLTAR AO MENU
+
+                <button
+                    id="hand-mode"
+                    class="mode-card"
+                    type="button"
+                    onclick="selecionarModo('mao')">
+
+                    <span class="mode-icon">
+                        ✋
+                    </span>
+
+                    <span class="mode-name">
+                        MÃO
+                    </span>
+
+                    <span class="mode-description">
+                        Feche a mão para pegar
+                    </span>
+
+                </button>
+
+            </div>
+
+            <!-- BOTÃO -->
+
+            <button
+                id="btn-jogar"
+                type="button"
+                onclick="jogar()">
+
+                <span>▶</span>
+                JOGAR AGORA
+
+            </button>
+
+
+            <!-- RANKING -->
+
+            <section class="ranking">
+
+                <div class="ranking-header">
+
+                    <div>
+                        🏆
+                        TOP CAÇADORES
+                    </div>
+
+                    <span>
+                        ONLINE
+                    </span>
+
+                </div>
+
+                <div id="ranking-list">
+
+                    <div class="ranking-loading">
+                        Carregando ranking...
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================================================= -->
+    <!-- JOGO -->
+    <!-- ================================================= -->
+
+    <main
+        id="game-screen"
+        class="hidden">
+
+        <!-- HUD -->
+
+        <div id="hud">
+
+            <div class="hud-item">
+                ❤️
+                <span id="lives-display">
+                    ❤️❤️❤️
+                </span>
+            </div>
+
+            <div class="hud-item">
+                PONTOS:
+                <strong id="score-display">
+                    0
+                </strong>
+            </div>
+
+            <div class="hud-item">
+                RECORDE:
+                <strong id="highscore-display">
+                    0
+                </strong>
+            </div>
+
+            <div class="hud-item">
+                NÍVEL:
+                <strong id="level-display">
+                    1
+                </strong>
+            </div>
+
+            <div class="hud-item">
+                TEMPO:
+                <strong id="time-display">
+                    60
+                </strong>
+            </div>
+
+        </div>
+
+
+        <!-- ÁREA DO JOGO -->
+
+        <div id="game-area">
+
+            <!-- Mosquito será criado aqui -->
+
+        </div>
+
+
+        <!-- CÂMERA -->
+
+        <div
+            id="camera-container"
+            class="hidden">
+
+            <video
+                id="camera-video"
+                autoplay
+                muted
+                playsinline>
+            </video>
+
+            <div
+                id="hand-status">
+                ✋ Mostre sua mão
+            </div>
+
+        </div>
+
+
+        <!-- CURSOR DA MÃO -->
+
+        <div
+            id="hand-cursor"
+            class="hidden">
+
+            <span>
+                ✋
+            </span>
+
+        </div>
+
+
+        <!-- OVERLAY -->
+
+        <div
+            id="game-overlay"
+            class="overlay hidden">
+
+            <div class="overlay-card">
+
+                <div class="overlay-icon">
+                    🦟
+                </div>
+
+                <h2 id="overlay-title">
+                    GAME OVER
+                </h2>
+
+                <p id="overlay-msg">
+                    Você perdeu!
+                </p>
+
+                <div class="final-score">
+
+                    <span>
+                        SUA PONTUAÇÃO
+                    </span>
+
+                    <strong id="final-score">
+                        0
+                    </strong>
+
+                </div>
+
+                <div
+                    id="record-message"
+                    class="record-message hidden">
+
+                    🏆 NOVO RECORDE!
+
+                </div>
+
+                <button
+                    onclick="reiniciarJogo()">
+
+                    🔄 JOGAR NOVAMENTE
+
+                </button>
+
+                <button
+                    class="secondary-button"
+                    onclick="voltarAoMenu()">
+
+                    ← VOLTAR AO MENU
+
                 </button>
 
             </div>
@@ -110,13 +302,69 @@
         </div>
 
 
-        <footer></footer>
+        <!-- BOTÃO SAIR -->
 
-    </div>
+        <button
+            id="btn-sair"
+            onclick="voltarAoMenu()">
 
+            ✕
+            MENU
+
+        </button>
+
+    </main>
+
+
+    <!-- ================================================= -->
+    <!-- MEDIAPIPE -->
+    <!-- ================================================= -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
+        crossorigin="anonymous">
+    </script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous">
+    </script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous">
+    </script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"
+        crossorigin="anonymous">
+    </script>
+
+
+    <!-- ================================================= -->
+    <!-- FIREBASE -->
+    <!-- ================================================= -->
+
+    <script
+        src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js">
+    </script>
+
+    <script
+        src="https://www.gstatic.com/firebasejs/12.19.0/firebase-database-compat.js">
+    </script>
+
+
+    <!-- ================================================= -->
+    <!-- JAVASCRIPT DO JOGO -->
+    <!-- ================================================= -->
+
+    <script src="js/firebase-config.js"></script>
+
+    <script src="js/hand.js"></script>
+
+    <script src="js/game.js"></script>
 
     <script src="js/script.js"></script>
-    <script src="js/game.js"></script>
 
 </body>
 
